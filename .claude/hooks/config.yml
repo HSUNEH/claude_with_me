@@ -1,0 +1,218 @@
+# ============================================================
+# 개발 시스템 중앙 설정 파일
+# ============================================================
+# 이 파일 하나만 수정하면 모든 Hook과 스킬 동작이 바뀝니다.
+# Hook 스크립트를 직접 수정할 필요 없습니다.
+# ============================================================
+
+
+# ─── 1. 키워드 매칭 ─────────────────────────────────────────
+# 프롬프트에서 이 단어가 감지되면 해당 카테고리로 분류
+keywords:
+  dev: "만들|개발|수정|추가|삭제|리팩토링|구현|생성|변경|fix|create|add|update|delete|refactor|implement|build"
+  test: "테스트|검증|확인|test|verify|check|spec|jest|pytest"
+  deploy: "배포|deploy|release|publish|docker|ci|cd"
+  docs: "문서|작성|readme|doc|설명|가이드|write.*doc"
+
+
+# ─── 2. 의도 파악 ───────────────────────────────────────────
+# 프롬프트 패턴 → 작업 유형 자동 분류 → 매뉴얼 챕터 추천
+intents:
+  new_feature:
+    patterns: "(새로운|새 |신규).*(기능|페이지|컴포넌트|모듈|API)|추가해|만들어|구현해|create|implement|add new"
+    label: "새 기능 개발"
+    chapters: "1(프로젝트 개요), 2(코딩 표준), 3(아키텍처)"
+    require_plan: true
+
+  bugfix:
+    patterns: "버그|오류|에러|안 ?됨|안 ?돼|수정해|고쳐|fix|bug|error|broken|not working|doesn.t work"
+    label: "버그 수정"
+    chapters: "1(프로젝트 개요), 4(에러 처리)"
+    require_plan: true
+
+  refactor:
+    patterns: "리팩토링|정리|개선|최적화|성능|refactor|clean ?up|optimize|improve|simplify"
+    label: "리팩토링"
+    chapters: "2(코딩 표준), 3(아키텍처)"
+    require_plan: true
+
+  api:
+    patterns: "api|엔드포인트|endpoint|라우트|route|요청|request|응답|response|REST|GraphQL"
+    label: "API 작업"
+    chapters: "2(코딩 표준), 3(아키텍처), 4(에러 처리), 5(보안)"
+    require_plan: true
+
+  security:
+    patterns: "보안|인증|권한|토큰|암호|security|auth|token|permission|encrypt|password|credential"
+    label: "보안 작업"
+    chapters: "5(보안), 4(에러 처리)"
+    require_plan: true
+
+  test:
+    patterns: "테스트|test|spec|검증|커버리지|coverage"
+    label: "테스트 작업"
+    chapters: "6(테스트)"
+    require_plan: false     # 테스트는 계획 없이도 진행 가능
+
+  docs:
+    patterns: "문서|doc|readme|가이드|설명서|주석|comment"
+    label: "문서 작업"
+    chapters: "1(프로젝트 개요)"
+    require_plan: false     # 문서 작업도 계획 없이 진행 가능
+
+
+# ─── 3. 작업 위치 (파일 경로 → 도메인 감지) ─────────────────
+# 파일 경로 패턴 → 도메인 분류 → 맞춤 검사 항목
+locations:
+  ui:
+    patterns: "(components?|pages?|views?|layouts?|app)/.*\\.(tsx?|jsx?|vue|svelte)"
+    label: "UI/프론트엔드"
+    focus: "XSS 방지, 접근성, 상태 관리, 렌더링 성능"
+    checklist:
+      - "XSS: 사용자 입력을 innerHTML/dangerouslySetInnerHTML로 렌더링하지 않는가?"
+      - "접근성: aria 속성, 키보드 네비게이션 고려했는가?"
+      - "상태: 불필요한 리렌더링은 없는가?"
+
+  api:
+    patterns: "(api|routes?|controllers?|handlers?)/"
+    label: "API/라우트"
+    focus: "입력 검증, 인증/인가, Rate Limiting, 에러 응답 형식"
+    checklist:
+      - "입력 검증: 모든 요청 파라미터를 검증하는가?"
+      - "인증/인가: 적절한 미들웨어가 적용되어 있는가?"
+      - "에러 응답: 통일된 형식으로 에러를 반환하는가?"
+      - "Rate Limit: 적용되어 있는가?"
+
+  service:
+    patterns: "(services?|lib|utils?|helpers?|hooks)/"
+    label: "서비스/로직"
+    focus: "에러 처리, 엣지 케이스, 타입 안전성, 단위 테스트"
+    checklist:
+      - "에러 처리: try-catch와 적절한 에러 타입을 사용하는가?"
+      - "엣지 케이스: null, undefined, 빈 배열 등 처리했는가?"
+      - "타입 안전성: any를 사용하지 않는가?"
+
+  db:
+    patterns: "(models?|schema|migration|prisma|drizzle|database|db)/"
+    label: "DB/모델"
+    focus: "SQL Injection 방지, 마이그레이션 안전성, 인덱스"
+    checklist:
+      - "SQL Injection: 파라미터 바인딩을 사용하는가?"
+      - "마이그레이션: 롤백 가능한 구조인가?"
+      - "인덱스: 쿼리 성능에 필요한 인덱스가 있는가?"
+
+  config:
+    patterns: "(config|\\.env|tsconfig|package\\.json|next\\.config|vite\\.config)"
+    label: "설정 파일"
+    focus: "환경변수 노출, 호환성, 기본값 설정"
+    checklist:
+      - "민감 정보: API 키나 비밀번호가 포함되어 있지 않는가?"
+      - "환경 분리: dev/prod 환경이 구분되어 있는가?"
+
+  test:
+    patterns: "(tests?|__tests__|spec|\\.test\\.|\\.spec\\.)"
+    label: "테스트"
+    focus: "커버리지, 엣지 케이스, 비동기 처리, Mock 정확성"
+    checklist:
+      - "커버리지: 핵심 로직을 충분히 테스트하는가?"
+      - "엣지 케이스: 경계값, 빈 값 등을 포함하는가?"
+
+  style:
+    patterns: "\\.(css|scss|sass|less|styled)"
+    label: "스타일"
+    focus: "반응형, 접근성, 성능 (불필요한 CSS)"
+    checklist:
+      - "반응형: 다양한 화면 크기에서 동작하는가?"
+      - "접근성: 충분한 색 대비를 제공하는가?"
+
+
+# ─── 4. 코드 패턴 감지 ──────────────────────────────────────
+# 파일 내용에서 감지할 위험/품질 패턴
+code_patterns:
+  security_dangerous_functions:
+    pattern: "(eval\\(|innerHTML|dangerouslySetInnerHTML|exec\\(|\\.raw\\()"
+    severity: "critical"
+    message: "[보안] 위험 함수 사용 감지 (eval/innerHTML/exec)"
+
+  security_hardcoded_secrets:
+    pattern: "(password|secret|api_key|apikey|token|credential)\\s*[:=]\\s*[\"'][^\"']"
+    severity: "critical"
+    message: "[보안] 하드코딩된 비밀정보 의심"
+
+  error_missing_catch:
+    # await/then 있는데 try-catch/catch 없으면
+    check_type: "dual"   # 존재 + 부재 동시 체크
+    must_exist: "(await |\\. then\\()"
+    must_not_exist: "(try\\s*\\{|\\.catch\\(|catch\\s*\\()"
+    severity: "warning"
+    message: "[에러처리] 비동기 호출에 try-catch/catch 누락 의심"
+
+  type_any_usage:
+    pattern: ":\\s*any\\b"
+    severity: "warning"
+    message: "[타입] any 타입 사용 감지"
+    count: true    # 건수 표시
+
+  debug_leftover:
+    pattern: "(console\\.(log|debug|warn)|debugger|TODO|FIXME|HACK|XXX)"
+    severity: "info"
+    message: "[정리] 디버그 코드/TODO 잔류 감지"
+
+
+# ─── 5. 완료 후 검사 설정 ───────────────────────────────────
+completion_check:
+  # 오류 분기 기준
+  threshold_immediate_fix: 3    # 이 수 이하면 즉시 수정
+  threshold_agent_recommend: 4  # 이 수 이상이면 전문 에이전트 권장
+
+  # 린터 설정 (자동 감지, 필요 시 수동 지정)
+  linters:
+    javascript:
+      enabled: true
+      command: "npx eslint"
+    typescript:
+      enabled: true
+      command: "npx tsc --noEmit"
+    python:
+      enabled: true
+      command: "python3 -m py_compile"
+
+
+# ─── 6. 전문 에이전트 설정 ──────────────────────────────────
+agents:
+  qa-agent:
+    type: "subagent"          # .claude/agents/qa-agent.md
+    description: "코드 검토, 오류 수정, 구조 개선"
+    trigger: "오류 다수 발견 시 자동 위임"
+    report_path: "docs/reports/qa-report-{date}.md"
+
+  test-agent:
+    type: "subagent"          # .claude/agents/test-agent.md
+    description: "기능 테스트, 오류 진단, 화면 확인"
+    trigger: "기능 완성 후 검증 필요 시 자동 위임"
+    report_path: "docs/reports/test-report-{date}.md"
+
+  planning-agent:
+    type: "subagent"          # .claude/agents/planning-agent.md
+    description: "계획 수립, 계획 검토, 문서 작성"
+    trigger: "새 작업 시작 시 자동 위임"
+    report_path: "docs/reports/planning-report-{date}.md"
+
+
+# ─── 7. 일반 설정 ───────────────────────────────────────────
+general:
+  # 변경 로그 파일 위치
+  change_log_path: "docs/logs/change-log.md"
+
+  # 계획 문서 위치
+  plans_path: "docs/plans"
+
+  # 보고서 위치
+  reports_path: "docs/reports"
+
+  # 셀프체크 기본 항목 (위치별 맞춤 체크가 없을 때 사용)
+  default_checklist:
+    - "위험한 부분은 없는가?"
+    - "에러 처리를 추가했는가?"
+    - "보안은 괜찮은가?"
+    - "빠뜨린 건 없는가?"

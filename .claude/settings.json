@@ -1,0 +1,91 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/plan-guard.sh",
+            "timeout": 5000,
+            "statusMessage": "📋 계획 확인 중..."
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre-prompt-check.sh",
+            "timeout": 5000,
+            "statusMessage": "📖 매뉴얼 체크 중..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/change-logger.sh",
+            "timeout": 3000,
+            "statusMessage": "📝 변경 기록 중..."
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-tool-check.sh",
+            "timeout": 5000,
+            "statusMessage": "🔍 품질 검사 중..."
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/checklist-tracker.sh",
+            "timeout": 5000,
+            "statusMessage": "☑️ 체크리스트 추적 중..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/change-logger.sh",
+            "timeout": 3000,
+            "statusMessage": "📝 변경 기록 중..."
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post-tool-check.sh",
+            "timeout": 5000,
+            "statusMessage": "🔍 품질 검사 중..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/completion-checker.sh",
+            "timeout": 30000,
+            "statusMessage": "🧪 린트 & 타입 체크 중..."
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/subagent-report-check.sh",
+            "timeout": 5000,
+            "statusMessage": "📊 서브에이전트 보고서 확인 중..."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,144 @@
+#!/bin/bash
+# ============================================================
+# [UserPromptSubmit Hook] 계획 없이 작업 시작 방지
+# ============================================================
+# 매칭 조건 활용:
+#   1. 키워드 → 개발 관련인지 필터링
+#   2. 의도 파악 → 새 작업 vs 이어서 vs 단순 수정 판별
+#   3. 작업 위치 → 관련 계획이 있는지 파일 경로로 탐색
+# ============================================================
+
+INPUT=$(cat)
+PROMPT=$(echo "$INPUT" | jq -r '.prompt // empty')
+CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
+
+# 매칭 유틸리티 로드
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib/matcher.sh"
+
+# ── 1. 키워드 매칭
+KEYWORD_TYPE=$(match_keywords "$PROMPT")
+if [ "$KEYWORD_TYPE" = "none" ]; then
+  exit 0
+fi
+
+# ── 2. 의도 파악
+INTENT=$(detect_intent "$PROMPT")
+
+# config.yml의 require_plan 설정에 따라 계획 강제 여부 판별
+if ! intent_requires_plan "$INTENT"; then
+  # 계획 없어도 진행 가능 — 가벼운 안내만
+  PLANS_DIR="$CWD/docs/plans"
+  if [ -d "$PLANS_DIR" ]; then
+    IN_PROGRESS=""
+    for checklist in "$PLANS_DIR"/*/CHECKLIST.md; do
+      [ -f "$checklist" ] || continue
+      if grep -q "🟡 진행 중" "$checklist" 2>/dev/null; then
+        PLAN_NAME=$(basename "$(dirname "$checklist")")
+        IN_PROGRESS="$PLAN_NAME"
+        break
+      fi
+    done
+    if [ -n "$IN_PROGRESS" ]; then
+      echo "───────────────────────────────────────────"
+      echo "📋 참고: 진행 중인 작업 '${IN_PROGRESS}'이 있습니다."
+      echo "───────────────────────────────────────────"
+    fi
+  fi
+  exit 0
+fi
+
+PLANS_DIR="$CWD/docs/plans"
+
+# ── 3. 작업 위치: 프롬프트에 파일 경로가 언급되었으면 관련 계획 탐색
+FILE_MENTION=$(echo "$PROMPT" | grep -oE '[a-zA-Z0-9_/.-]+\.(ts|tsx|js|jsx|py|vue|svelte|css|json)' | head -1)
+RELATED_PLAN=""
+if [ -n "$FILE_MENTION" ] && [ -d "$PLANS_DIR" ]; then
+  for plan in "$PLANS_DIR"/*/PLAN.md; do
+    [ -f "$plan" ] || continue
+    if grep -q "$FILE_MENTION" "$plan" 2>/dev/null; then
+      RELATED_PLAN=$(basename "$(dirname "$plan")")
+      break
+    fi
+  done
+fi
+
+# plans 디렉토리 존재 확인
+if [ ! -d "$PLANS_DIR" ]; then
+  cat <<'MSG'
+───────────────────────────────────────────
+⚠️ [계획 관리] 계획서가 없습니다
+───────────────────────────────────────────
+
+개발 작업을 시작하기 전에 계획을 먼저 수립하세요.
+
+👉 /plan-manager 스킬을 실행하여 3문서를 생성하세요:
+   1. PLAN.md     (계획서)
+   2. CONTEXT.md  (맥락 노트)
+   3. CHECKLIST.md (체크리스트)
+
+계획 승인 후 작업을 시작합니다.
+───────────────────────────────────────────
+MSG
+  exit 0
+fi
+
+# 파일 경로로 관련 계획을 찾은 경우
+if [ -n "$RELATED_PLAN" ]; then
+  cat <<MSG
+───────────────────────────────────────────
+📋 [계획 관리] 관련 계획 발견
+───────────────────────────────────────────
+
+언급된 파일: ${FILE_MENTION}
+관련 계획:   ${RELATED_PLAN}
+
+📂 docs/plans/${RELATED_PLAN}/
+   → PLAN.md, CONTEXT.md, CHECKLIST.md 를 확인하세요.
+───────────────────────────────────────────
+MSG
+  exit 0
+fi
+
+# 진행 중인 체크리스트 찾기
+IN_PROGRESS=""
+for checklist in "$PLANS_DIR"/*/CHECKLIST.md; do
+  [ -f "$checklist" ] || continue
+  if grep -q "🟡 진행 중" "$checklist" 2>/dev/null; then
+    PLAN_DIR=$(dirname "$checklist")
+    PLAN_NAME=$(basename "$PLAN_DIR")
+    IN_PROGRESS="$PLAN_NAME"
+    break
+  fi
+done
+
+if [ -n "$IN_PROGRESS" ]; then
+  cat <<MSG
+───────────────────────────────────────────
+📋 [계획 관리] 진행 중인 작업 감지
+───────────────────────────────────────────
+
+현재 진행 중: ${IN_PROGRESS}
+
+📂 docs/plans/${IN_PROGRESS}/
+   → CHECKLIST.md를 확인하고 이어서 작업하세요.
+   → 새로운 작업이라면 /plan-manager로 새 계획을 수립하세요.
+───────────────────────────────────────────
+MSG
+else
+  PLAN_COUNT=$(find "$PLANS_DIR" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l)
+
+  cat <<MSG
+───────────────────────────────────────────
+📋 [계획 관리] 기존 계획 ${PLAN_COUNT}건 존재
+───────────────────────────────────────────
+
+현재 진행 중인 작업은 없습니다.
+
+→ 기존 계획을 이어서 하려면: docs/plans/ 확인
+→ 새 작업이라면: /plan-manager로 계획 수립 먼저
+───────────────────────────────────────────
+MSG
+fi
+
+exit 0
