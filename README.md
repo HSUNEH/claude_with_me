@@ -14,14 +14,14 @@ cp -r dev-system-template/docs     your-project/docs/
 # 2. 실행 권한 부여
 chmod +x your-project/.claude/hooks/*.sh your-project/.claude/hooks/lib/*.sh
 
-# 3. Claude Code에서 /init 실행
+# 3. Claude Code에서 /setup 실행
 ```
 
-`/init`을 실행하면 5단계 대화형 위저드가 프로젝트 정보를 수집하고 환경을 자동 세팅합니다.
+`/setup`을 실행하면 5단계 대화형 위저드가 프로젝트 정보를 수집하고 환경을 자동 세팅합니다.
 
 ---
 
-## `/init` 위저드
+## `/setup` 위저드
 
 | 단계 | 내용 | 산출물 |
 |------|------|--------|
@@ -123,7 +123,7 @@ your-project/
 │   │   ├── test-agent.md             테스트 작성/실행 (sonnet)
 │   │   └── planning-agent.md         계획/문서 전용 (sonnet)
 │   └── skills/
-│       ├── init-project/SKILL.md     /init
+│       ├── setup/SKILL.md     /setup
 │       ├── plan-manager/SKILL.md     /plan-manager
 │       └── dev-manual/               /dev-manual
 │           ├── SKILL.md
@@ -132,7 +132,7 @@ your-project/
 │   ├── plans/{작업명}/               계획 3문서
 │   ├── logs/change-log.md            변경 로그 (자동)
 │   └── reports/                      서브에이전트 보고서
-└── CLAUDE.md                         프로젝트 설정 (/init이 생성)
+└── CLAUDE.md                         프로젝트 설정 (/setup이 생성)
 ```
 
 ---
@@ -186,7 +186,7 @@ completion_check:
 | 05-security | 인증/인가, 보안 체크리스트 |
 | 06-testing | 테스트 전략, 커버리지 기준 |
 
-`/init`이 프로젝트 정보 기반으로 자동 생성하므로 직접 작성할 필요는 없습니다.
+`/setup`이 프로젝트 정보 기반으로 자동 생성하므로 직접 작성할 필요는 없습니다.
 
 ---
 
@@ -209,7 +209,7 @@ completion_check:
 
 | 명령어 | 설명 |
 |--------|------|
-| `/init` | 프로젝트 초기화 5단계 위저드 |
+| `/setup` | 프로젝트 초기화 5단계 위저드 |
 | `/plan-manager` | 개발 계획 3문서 생성 |
 | `/dev-manual` | 작업 유형별 매뉴얼 챕터 읽기 |
 

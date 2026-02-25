@@ -16,7 +16,7 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/matcher.sh"
 
-# ── 0. 초기 세팅 감지: 챕터가 비어있으면 /init 안내
+# ── 0. 초기 세팅 감지: 챕터가 비어있으면 /setup 안내
 CHAPTERS_DIR="$CWD/.claude/skills/dev-manual/chapters"
 INIT_MARKER="$CWD/.claude/.initialized"
 if [ ! -f "$INIT_MARKER" ] && [ -d "$CHAPTERS_DIR" ]; then
@@ -31,7 +31,7 @@ if [ ! -f "$INIT_MARKER" ] && [ -d "$CHAPTERS_DIR" ]; then
 ───────────────────────────────────────────
 
 매뉴얼 챕터가 아직 작성되지 않았습니다.
-먼저 /init 을 실행하여 프로젝트 초기화 위저드를 시작하세요.
+먼저 /setup 을 실행하여 프로젝트 초기화 위저드를 시작하세요.
 
 → 5단계 대화형 위저드로 프로젝트 전체 세팅을 완료합니다.
   (비전 수집 → 환경 분석 → 워크플로우 → 개발 계획 → 환경 세팅)

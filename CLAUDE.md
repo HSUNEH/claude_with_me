@@ -6,17 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Claude Code 개발 환경에서 **계획 수립 → 매뉴얼 참조 → 작업 수행 → 자동 품질 검사 → 전문 에이전트 투입**을 강제하는 개발 시스템 템플릿이다. 프로젝트에 `.claude/`와 `docs/`를 복사하여 적용한다.
 
-## 처음 사용 시 — 반드시 `/init` 먼저
+## 처음 사용 시 — 반드시 `/setup` 먼저
 
-이 시스템을 새 프로젝트에 적용한 직후에는 **반드시 `/init`을 먼저 실행**해야 한다.
-`/init`은 5단계 대화형 위저드로 프로젝트 전체 세팅을 완료한다:
+이 시스템을 새 프로젝트에 적용한 직후에는 **반드시 `/setup`을 먼저 실행**해야 한다.
+`/setup`은 5단계 대화형 위저드로 프로젝트 전체 세팅을 완료한다:
 
 ```
-/init 실행 → 프로젝트 비전 수집 → 기술 환경 분석 → 워크플로우 설정
+/setup 실행 → 프로젝트 비전 수집 → 기술 환경 분석 → 워크플로우 설정
          → 초기 개발 계획 수립 → 환경 세팅 자동 적용
 ```
 
-**`/init` 완료 후 이 CLAUDE.md는 프로젝트 전용 내용으로 자동 교체된다.**
+**`/setup` 완료 후 이 CLAUDE.md는 프로젝트 전용 내용으로 자동 교체된다.**
 
 `.claude/.initialized` 마커가 없으면 아직 초기 세팅이 안 된 것이다.
 
@@ -73,7 +73,7 @@ Claude Code 개발 환경에서 **계획 수립 → 매뉴얼 참조 → 작업 
 
 ### 스킬 (`.claude/skills/`)
 
-- `/init`: 프로젝트 초기화 위저드. 5단계 대화로 비전 수집 → 환경 분석 → 워크플로우 설정 → 초기 계획 → 환경 세팅
+- `/setup`: 프로젝트 초기화 위저드. 5단계 대화로 비전 수집 → 환경 분석 → 워크플로우 설정 → 초기 계획 → 환경 세팅
 - `/dev-manual`: 6개 챕터(프로젝트개요/코딩표준/아키텍처/에러처리/보안/테스트)를 필요한 것만 선택적으로 읽음
 - `/plan-manager`: 코드 작성 전 3문서(PLAN/CONTEXT/CHECKLIST) 생성. kebab-case 폴더명 사용
 
@@ -82,7 +82,7 @@ Claude Code 개발 환경에서 **계획 수립 → 매뉴얼 참조 → 작업 
 - `.claude/hooks/config.yml` — Hook 동작 규칙 전체 (키워드, 의도, 경로 패턴, 코드 패턴, 임계값 등)
 - `.claude/skills/dev-manual/chapters/` — 프로젝트별 매뉴얼 내용 (01~06)
 
-그 외 `.claude/` 내부 파일(settings.json, *.sh, agents/, skills/plan-manager/, skills/init-project/)은 시스템 내부 파일로 수정 불필요.
+그 외 `.claude/` 내부 파일(settings.json, *.sh, agents/, skills/plan-manager/, skills/setup/)은 시스템 내부 파일로 수정 불필요.
 
 ## 설치
 
@@ -92,4 +92,4 @@ cp -r dev-system-template/docs docs/
 chmod +x .claude/hooks/*.sh .claude/hooks/lib/*.sh
 ```
 
-설치 후 `/init`을 실행하여 프로젝트 세팅을 완료한다.
+설치 후 `/setup`을 실행하여 프로젝트 세팅을 완료한다.

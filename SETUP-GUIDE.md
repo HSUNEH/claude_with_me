@@ -46,7 +46,7 @@ dev-system-template/
 │   │   ├── test-agent.md                    ← [서브에이전트] 테스트
 │   │   └── planning-agent.md                ← [서브에이전트] 기획
 │   └── skills/
-│       ├── init-project/                     ← [초기화 위저드] /init 으로 실행
+│       ├── setup/                     ← [초기화 위저드] /setup 으로 실행
 │       │   └── SKILL.md
 │       ├── dev-manual/                       ← [시스템 1] 자동 매뉴얼
 │       │   ├── SKILL.md
@@ -308,22 +308,22 @@ chmod +x .claude/hooks/*.sh .claude/hooks/lib/*.sh
 
 # 3. Claude Code 실행 → 초기 세팅 자동 안내
 # 아무 개발 지시를 입력하면 초기 세팅 안내가 뜸
-# 또는 직접 /init 실행
+# 또는 직접 /setup 실행
 ```
 
-### 초기 세팅 흐름 (/init)
+### 초기 세팅 흐름 (/setup)
 
-처음 실행하면 시스템이 자동으로 감지하고 `/init` 실행을 안내합니다.
+처음 실행하면 시스템이 자동으로 감지하고 `/setup` 실행을 안내합니다.
 
 ```
 사용자: "로그인 기능 만들어줘"
     │
     ▼
 🚀 [초기 세팅] 프로젝트 설정이 필요합니다
-→ /init 을 실행하여 프로젝트 초기화 위저드를 시작하세요
+→ /setup 을 실행하여 프로젝트 초기화 위저드를 시작하세요
     │
     ▼
-사용자: /init
+사용자: /setup
     │
     ▼
 ━━━ Phase 1: 프로젝트 비전 ━━━
