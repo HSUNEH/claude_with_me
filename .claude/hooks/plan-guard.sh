@@ -100,8 +100,9 @@ MSG
   exit 0
 fi
 
-# 진행 중인 체크리스트 찾기
+# 체크리스트 상태별 분류
 IN_PROGRESS=""
+PENDING_APPROVAL=""
 for checklist in "$PLANS_DIR"/*/CHECKLIST.md; do
   [ -f "$checklist" ] || continue
   if grep -q "🟡 진행 중" "$checklist" 2>/dev/null; then
@@ -109,20 +110,79 @@ for checklist in "$PLANS_DIR"/*/CHECKLIST.md; do
     PLAN_NAME=$(basename "$PLAN_DIR")
     IN_PROGRESS="$PLAN_NAME"
     break
+  elif grep -q "🔴 시작 전" "$checklist" 2>/dev/null; then
+    PLAN_DIR=$(dirname "$checklist")
+    PLAN_NAME=$(basename "$PLAN_DIR")
+    PENDING_APPROVAL="$PLAN_NAME"
   fi
 done
 
-if [ -n "$IN_PROGRESS" ]; then
+# ── 미승인 계획 감지 (🔴 시작 전) — 코드 작성 차단
+if [ -n "$PENDING_APPROVAL" ] && [ -z "$IN_PROGRESS" ]; then
   cat <<MSG
 ───────────────────────────────────────────
-📋 [계획 관리] 진행 중인 작업 감지
+⛔ [계획 관리] 승인 대기 중인 계획 감지
 ───────────────────────────────────────────
 
-현재 진행 중: ${IN_PROGRESS}
+계획: ${PENDING_APPROVAL} (🔴 시작 전)
+
+📂 docs/plans/${PENDING_APPROVAL}/
+   → 사용자에게 계획을 보여주고 승인을 받으세요.
+   → 승인 전까지 코드를 작성하지 마세요.
+   → 승인 후 CHECKLIST.md 상태를 🟡 진행 중 으로 변경하세요.
+───────────────────────────────────────────
+MSG
+  exit 0
+fi
+
+if [ -n "$IN_PROGRESS" ]; then
+  PLAN_DIR="$PLANS_DIR/$IN_PROGRESS"
+  CHECKLIST_FILE="$PLAN_DIR/CHECKLIST.md"
+
+  # CHECKLIST.md에서 진행 상황 추출
+  TOTAL_TASKS=0
+  DONE_TASKS=0
+  CURRENT_PHASE=""
+  NEXT_ITEMS=""
+
+  if [ -f "$CHECKLIST_FILE" ]; then
+    TOTAL_TASKS=$(grep -c '^\s*- \[' "$CHECKLIST_FILE" 2>/dev/null || echo "0")
+    DONE_TASKS=$(grep -c '^\s*- \[x\]' "$CHECKLIST_FILE" 2>/dev/null || echo "0")
+
+    # 현재 Phase: 첫 번째 미체크 Phase 라인
+    CURRENT_PHASE=$(grep -m1 '^\s*- \[ \] Phase' "$CHECKLIST_FILE" 2>/dev/null | sed 's/^.*- \[ \] //')
+
+    # 현재 Phase의 세부 작업 (미체크 항목만, 최대 5개)
+    if [ -n "$CURRENT_PHASE" ]; then
+      NEXT_ITEMS=$(awk '
+        /- \[ \] Phase/ { if (found) exit; found=1; next }
+        found && /- \[ \]/ { gsub(/^[[:space:]]*- \[ \] /, "  · "); print; count++; if(count>=5) exit }
+        found && /- \[ \] Phase/ { exit }
+      ' "$CHECKLIST_FILE" 2>/dev/null)
+    fi
+  fi
+
+  cat <<MSG
+───────────────────────────────────────────
+📋 [컨텍스트] ${IN_PROGRESS} (🟡 진행 중)
+───────────────────────────────────────────
+
+진행: ${DONE_TASKS}/${TOTAL_TASKS} 완료
+MSG
+
+  if [ -n "$CURRENT_PHASE" ]; then
+    echo "현재: ${CURRENT_PHASE}"
+  fi
+  if [ -n "$NEXT_ITEMS" ]; then
+    echo ""
+    echo "남은 작업:"
+    echo "$NEXT_ITEMS"
+  fi
+
+  cat <<MSG
 
 📂 docs/plans/${IN_PROGRESS}/
-   → CHECKLIST.md를 확인하고 이어서 작업하세요.
-   → 새로운 작업이라면 /plan-manager로 새 계획을 수립하세요.
+   → PLAN.md, CHECKLIST.md를 읽고 이어서 작업하세요.
 ───────────────────────────────────────────
 MSG
 else
