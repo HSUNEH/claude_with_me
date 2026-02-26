@@ -306,10 +306,13 @@ cp -r dev-system-template/docs docs/
 # 2. 실행 권한
 chmod +x .claude/hooks/*.sh .claude/hooks/lib/*.sh
 
-# 3. Claude Code 실행 → 초기 세팅 자동 안내
-# 아무 개발 지시를 입력하면 초기 세팅 안내가 뜸
-# 또는 직접 /setup 실행
+# 3. Claude Code 종료 후 재시작 (스킬 인식을 위해 필수)
+/exit
+
+# 4. 재시작 후 /setup 실행
 ```
+
+> **주의:** 설치 후 반드시 `/exit`으로 Claude Code를 종료하고 다시 시작해야 합니다. 재시작해야 `/setup` 등 스킬이 인식됩니다.
 
 ### 초기 세팅 흐름 (/setup)
 

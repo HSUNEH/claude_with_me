@@ -34,7 +34,7 @@ match_keywords() {
     done
   else
     # 폴백: 내장 기본값
-    if echo "$TEXT" | grep -qiE '만들|개발|수정|추가|삭제|리팩토링|구현|생성|변경|fix|create|add|update|delete|refactor|implement|build'; then echo "dev"; return 0; fi
+    if echo "$TEXT" | grep -qiE '만들|개발|수정|추가|삭제|리팩토링|구현|생성|변경|합[쳐치]|병합|넣[어고]|붙[여이]|옮[기겨]|분리|나[누눠]|fix|create|add|update|delete|refactor|implement|build|merge|split|move'; then echo "dev"; return 0; fi
     if echo "$TEXT" | grep -qiE '테스트|검증|확인|test|verify|check|spec'; then echo "test"; return 0; fi
     if echo "$TEXT" | grep -qiE '배포|deploy|release|publish|docker'; then echo "deploy"; return 0; fi
     if echo "$TEXT" | grep -qiE '문서|작성|readme|doc|설명|가이드'; then echo "docs"; return 0; fi
@@ -74,9 +74,9 @@ detect_intent() {
     # config에서 못 읽으면 내장 기본값
     if [ -z "$PATTERN" ]; then
       case "$INTENT" in
-        new_feature) PATTERN="(새로운|새 |신규).*(기능|페이지|컴포넌트|모듈|API)|추가해|만들어|구현해|create|implement|add new" ;;
-        bugfix)      PATTERN="버그|오류|에러|안 ?됨|안 ?돼|수정해|고쳐|fix|bug|error|broken|not working" ;;
-        refactor)    PATTERN="리팩토링|정리|개선|최적화|성능|refactor|clean ?up|optimize|improve" ;;
+        new_feature) PATTERN="(새로운|새 |신규).*(기능|페이지|컴포넌트|모듈|API)|추가[해하할]|만들[어고]|구현[해하]|넣[어고]|생성[해하]|붙[여이]|create|implement|add new|add .*to" ;;
+        bugfix)      PATTERN="버그|오류|에러|안 ?됨|안 ?돼|수정[해하]|고[쳐치]|fix|bug|error|broken|not working" ;;
+        refactor)    PATTERN="리팩토링|정리[해하]?|개선[해하]?|최적화|성능|합[쳐치]|병합[해하]?|분리[해하]?|나[누눠]|옮[기겨]|refactor|clean ?up|optimize|improve|simplify|merge|split|move" ;;
         api)         PATTERN="api|엔드포인트|endpoint|라우트|route|요청|request|응답|response|REST|GraphQL" ;;
         security)    PATTERN="보안|인증|권한|토큰|암호|security|auth|token|permission|encrypt" ;;
         test)        PATTERN="테스트|test|spec|검증|커버리지|coverage" ;;

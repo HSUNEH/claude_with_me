@@ -9,7 +9,7 @@
 # ─── 1. 키워드 매칭 ─────────────────────────────────────────
 # 프롬프트에서 이 단어가 감지되면 해당 카테고리로 분류
 keywords:
-  dev: "만들|개발|수정|추가|삭제|리팩토링|구현|생성|변경|시작|이어서|계속|진행|다음|깨졌|안 ?[되돼]|fix|create|add|update|delete|refactor|implement|build|start|continue|resume|next"
+  dev: "만들|개발|수정|추가|삭제|리팩토링|구현|생성|변경|시작|이어서|계속|진행|다음|깨졌|안 ?[되돼]|합[쳐치]|병합|넣[어고]|붙[여이]|옮[기겨]|분리|나[누눠]|fix|create|add|update|delete|refactor|implement|build|start|continue|resume|next|merge|split|move"
   test: "테스트|검증|확인|test|verify|check|spec|jest|pytest"
   deploy: "배포|deploy|release|publish|docker|ci|cd"
   docs: "문서|작성|readme|doc|설명|가이드|write.*doc"
@@ -19,19 +19,19 @@ keywords:
 # 프롬프트 패턴 → 작업 유형 자동 분류 → 매뉴얼 챕터 추천
 intents:
   new_feature:
-    patterns: "(새로운|새 |신규).*(기능|페이지|컴포넌트|모듈|API)|추가해|만들어|구현해|create|implement|add new"
+    patterns: "(새로운|새 |신규).*(기능|페이지|컴포넌트|모듈|API)|추가[해하할]|만들[어고]|구현[해하]|넣[어고]|생성[해하]|붙[여이]|create|implement|add new|add .*to"
     label: "새 기능 개발"
     chapters: "1(프로젝트 개요), 2(코딩 표준), 3(아키텍처)"
     require_plan: true
 
   bugfix:
-    patterns: "버그|오류|에러|안 ?됨|안 ?돼|수정해|고쳐|fix|bug|error|broken|not working|doesn.t work"
+    patterns: "버그|오류|에러|안 ?됨|안 ?돼|수정[해하]|고[쳐치]|fix|bug|error|broken|not working|doesn.t work"
     label: "버그 수정"
     chapters: "1(프로젝트 개요), 4(에러 처리)"
     require_plan: true
 
   refactor:
-    patterns: "리팩토링|정리|개선|최적화|성능|refactor|clean ?up|optimize|improve|simplify"
+    patterns: "리팩토링|정리[해하]?|개선[해하]?|최적화|성능|합[쳐치]|병합[해하]?|분리[해하]?|나[누눠]|옮[기겨]|refactor|clean ?up|optimize|improve|simplify|merge|split|move"
     label: "리팩토링"
     chapters: "2(코딩 표준), 3(아키텍처)"
     require_plan: true

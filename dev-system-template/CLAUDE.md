@@ -92,4 +92,7 @@ cp -r dev-system-template/docs docs/
 chmod +x .claude/hooks/*.sh .claude/hooks/lib/*.sh
 ```
 
-설치 후 `/setup`을 실행하여 프로젝트 세팅을 완료한다.
+**설치 후 Claude Code를 한번 종료(`/exit`)한 뒤 다시 시작해야 합니다.**
+재시작해야 `/setup` 등 스킬이 인식됩니다.
+
+재시작 후 `/setup`을 실행하여 프로젝트 세팅을 완료한다.

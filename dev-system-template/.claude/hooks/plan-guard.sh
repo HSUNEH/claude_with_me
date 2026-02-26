@@ -16,12 +16,20 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/matcher.sh"
 
-# ── 0. 초기 세팅 완료 확인
+# ── 0. 스킬 커맨드 바이패스 (/setup, /plan-manager 등)
+# 슬래시로 시작하는 스킬 명령은 항상 통과시킨다.
+# 세팅 미완료 상태에서도 /setup을 실행할 수 있어야 하고,
+# 계획 미수립 상태에서도 /plan-manager를 실행할 수 있어야 한다.
+if echo "$PROMPT" | grep -qE '^\s*/[a-zA-Z]'; then
+  exit 0
+fi
+
+# ── 0.5. 초기 세팅 완료 확인
 INIT_MARKER="$CWD/.claude/.initialized"
 if [ ! -f "$INIT_MARKER" ]; then
   # .claude/ 디렉토리가 존재하는데 .initialized가 없으면 = 세팅 미완료
   if [ -d "$CWD/.claude/hooks" ]; then
-    cat <<'MSG'
+    cat >&2 <<'MSG'
 ───────────────────────────────────────────
 ⛔ [세팅 미완료] /setup이 아직 끝나지 않았습니다
 ───────────────────────────────────────────
@@ -30,13 +38,17 @@ if [ ! -f "$INIT_MARKER" ]; then
 /setup의 Phase 5까지 완료해야 개발을 시작할 수 있습니다.
 
 👉 /setup 을 실행하여 세팅을 완료하세요.
+
+💡 GitHub에서 설치한 직후라면:
+   Claude Code를 한번 종료(/exit)한 뒤 다시 시작하세요.
+   재시작해야 /setup 스킬이 인식됩니다.
 ───────────────────────────────────────────
 MSG
-    exit 0
+    exit 2
   fi
 fi
 
-# ── 0.5. 글로벌 계획 강제 토글 확인
+# ── 1. 글로벌 계획 강제 토글 확인
 if $_HAS_CONFIG 2>/dev/null; then
   GLOBAL_REQUIRE=$(cfg_get_general "require_plan" 2>/dev/null)
   if [ "$GLOBAL_REQUIRE" = "false" ]; then
@@ -44,13 +56,13 @@ if $_HAS_CONFIG 2>/dev/null; then
   fi
 fi
 
-# ── 1. 키워드 매칭
+# ── 2. 키워드 매칭
 KEYWORD_TYPE=$(match_keywords "$PROMPT")
 if [ "$KEYWORD_TYPE" = "none" ]; then
   exit 0
 fi
 
-# ── 2. 의도 파악
+# ── 3. 의도 파악
 INTENT=$(detect_intent "$PROMPT")
 
 # config.yml의 require_plan 설정에 따라 계획 강제 여부 판별
@@ -78,7 +90,7 @@ fi
 
 PLANS_DIR="$CWD/docs/plans"
 
-# ── 3. 작업 위치: 프롬프트에 파일 경로가 언급되었으면 관련 계획 탐색
+# ── 4. 작업 위치: 프롬프트에 파일 경로가 언급되었으면 관련 계획 탐색
 FILE_MENTION=$(echo "$PROMPT" | grep -oE '[a-zA-Z0-9_/.-]+\.(ts|tsx|js|jsx|py|vue|svelte|css|json)' | head -1)
 RELATED_PLAN=""
 if [ -n "$FILE_MENTION" ] && [ -d "$PLANS_DIR" ]; then
@@ -98,14 +110,7 @@ if [ ! -d "$PLANS_DIR" ]; then
 ⚠️ [계획 관리] 계획서가 없습니다
 ───────────────────────────────────────────
 
-개발 작업을 시작하기 전에 계획을 먼저 수립하세요.
-
-👉 /plan-manager 스킬을 실행하여 3문서를 생성하세요:
-   1. PLAN.md     (계획서)
-   2. CONTEXT.md  (맥락 노트)
-   3. CHECKLIST.md (체크리스트)
-
-계획 승인 후 작업을 시작합니다.
+💡 /plan-manager 로 3문서를 생성하면 체계적으로 작업할 수 있습니다.
 ───────────────────────────────────────────
 MSG
   exit 0
@@ -152,18 +157,16 @@ for checklist in "$PLANS_DIR"/*/CHECKLIST.md; do
   fi
 done
 
-# ── 미승인 계획 감지 (🔴 시작 전) — 코드 작성 차단
+# ── 미승인 계획 감지 (🔴 시작 전) — 안내
 if [ -n "$PENDING_APPROVAL" ] && [ -z "$IN_PROGRESS" ]; then
   cat <<MSG
 ───────────────────────────────────────────
-⛔ [계획 관리] 승인 대기 중인 계획 감지
+⚠️ [계획 관리] 승인 대기 중인 계획이 있습니다
 ───────────────────────────────────────────
 
 계획: ${PENDING_APPROVAL} (🔴 시작 전)
 
 📂 docs/plans/${PENDING_APPROVAL}/
-   → 사용자에게 계획을 보여주고 승인을 받으세요.
-   → 승인 전까지 코드를 작성하지 마세요.
    → 승인 후 CHECKLIST.md 상태를 🟡 진행 중 으로 변경하세요.
 ───────────────────────────────────────────
 MSG
@@ -227,12 +230,10 @@ else
 ⚠️ [계획 관리] 진행 중인 계획이 없습니다
 ───────────────────────────────────────────
 
-새 작업을 시작하려면 계획을 먼저 수립하세요.
-
-👉 /plan-manager 를 실행하여 3문서를 생성하세요.
-   계획 승인 후 작업을 시작합니다.
+💡 /plan-manager 로 새 계획을 수립하면 체계적으로 작업할 수 있습니다.
 ───────────────────────────────────────────
 MSG
+  exit 0
 fi
 
 exit 0
