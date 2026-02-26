@@ -16,30 +16,21 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/matcher.sh"
 
-# ── 0. 초기 세팅 감지: 챕터가 비어있으면 /setup 안내
-CHAPTERS_DIR="$CWD/.claude/skills/dev-manual/chapters"
+# ── 0. 초기 세팅 감지: .initialized 마커 없으면 /setup 안내
 INIT_MARKER="$CWD/.claude/.initialized"
-if [ ! -f "$INIT_MARKER" ] && [ -d "$CHAPTERS_DIR" ]; then
-  # 01 챕터가 템플릿 상태인지 확인 (100바이트 이하면 미작성)
-  CHAPTER_01="$CHAPTERS_DIR/01-project-overview.md"
-  if [ -f "$CHAPTER_01" ]; then
-    CHAPTER_SIZE=$(wc -c < "$CHAPTER_01" 2>/dev/null || echo "0")
-    if [ "$CHAPTER_SIZE" -lt 200 ]; then
-      cat <<'INIT'
+if [ ! -f "$INIT_MARKER" ] && [ -d "$CWD/.claude/hooks" ]; then
+  cat <<'INIT'
 ───────────────────────────────────────────
 🚀 [초기 세팅] 프로젝트 설정이 필요합니다
 ───────────────────────────────────────────
 
-매뉴얼 챕터가 아직 작성되지 않았습니다.
 먼저 /setup 을 실행하여 프로젝트 초기화 위저드를 시작하세요.
 
 → 5단계 대화형 위저드로 프로젝트 전체 세팅을 완료합니다.
   (비전 수집 → 환경 분석 → 워크플로우 → 개발 계획 → 환경 세팅)
 ───────────────────────────────────────────
 INIT
-      exit 0
-    fi
-  fi
+  exit 0
 fi
 
 # ── 1. 키워드 매칭: 개발 관련이 아니면 스킵
