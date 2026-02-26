@@ -47,13 +47,25 @@ match_keywords() {
 
 # ─── 2. 의도 파악 ───────────────────────────────────────────
 
-# 의도 목록 (순서가 우선순위)
-_INTENT_ORDER="new_feature bugfix refactor api security test docs"
+# 의도 목록: config.yml에서 동적으로 읽고, 없으면 기본값 사용
+_INTENT_ORDER_DEFAULT="new_feature bugfix refactor api security test docs"
+
+_get_intent_order() {
+  if $_HAS_CONFIG; then
+    local FROM_CONFIG=$(cfg_list_intents)
+    if [ -n "$FROM_CONFIG" ]; then
+      echo "$FROM_CONFIG"
+      return
+    fi
+  fi
+  echo "$_INTENT_ORDER_DEFAULT"
+}
 
 detect_intent() {
   local TEXT="$1"
+  local INTENT_ORDER=$(_get_intent_order)
 
-  for INTENT in $_INTENT_ORDER; do
+  for INTENT in $INTENT_ORDER; do
     local PATTERN=""
     if $_HAS_CONFIG; then
       PATTERN=$(cfg_get_intent_field "$INTENT" "patterns")
@@ -69,6 +81,7 @@ detect_intent() {
         security)    PATTERN="보안|인증|권한|토큰|암호|security|auth|token|permission|encrypt" ;;
         test)        PATTERN="테스트|test|spec|검증|커버리지|coverage" ;;
         docs)        PATTERN="문서|doc|readme|가이드|설명서|주석|comment" ;;
+        *)           ;; # 커스텀 의도: config.yml에 patterns가 없으면 스킵
       esac
     fi
 
@@ -124,12 +137,25 @@ intent_to_label() {
 
 # ─── 3. 작업 위치 ───────────────────────────────────────────
 
-_LOCATION_ORDER="ui api service db config test style"
+# 위치 목록: config.yml에서 동적으로 읽고, 없으면 기본값 사용
+_LOCATION_ORDER_DEFAULT="ui api service db config test style"
+
+_get_location_order() {
+  if $_HAS_CONFIG; then
+    local FROM_CONFIG=$(cfg_list_locations)
+    if [ -n "$FROM_CONFIG" ]; then
+      echo "$FROM_CONFIG"
+      return
+    fi
+  fi
+  echo "$_LOCATION_ORDER_DEFAULT"
+}
 
 detect_location() {
   local FILE_PATH="$1"
+  local LOCATION_ORDER=$(_get_location_order)
 
-  for LOC in $_LOCATION_ORDER; do
+  for LOC in $LOCATION_ORDER; do
     local PATTERN=""
     if $_HAS_CONFIG; then
       PATTERN=$(cfg_get_location_field "$LOC" "patterns")
@@ -144,6 +170,7 @@ detect_location() {
         config)  PATTERN="(config|\.env|tsconfig|package\.json|next\.config|vite\.config)" ;;
         test)    PATTERN="(tests?|__tests__|spec|\.test\.|\.spec\.)" ;;
         style)   PATTERN="\.(css|scss|sass|less|styled)" ;;
+        *)       ;; # 커스텀 위치: config.yml에 patterns가 없으면 스킵
       esac
     fi
 

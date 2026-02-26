@@ -208,6 +208,12 @@ agents:
 
 # ─── 7. 일반 설정 ───────────────────────────────────────────
 general:
+  # 계획 강제 글로벌 토글
+  #   true  = 기본값. 의도별 require_plan 설정에 따라 계획을 강제한다.
+  #   false = 모든 계획 강제를 해제한다. 의도별 require_plan 설정을 무시한다.
+  #           사용자가 "계획 없이 진행해줘" 등 요청할 때만 false로 변경.
+  require_plan: true
+
   # 변경 로그 파일 위치
   change_log_path: "docs/logs/change-log.md"
 

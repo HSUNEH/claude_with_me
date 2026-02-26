@@ -36,6 +36,14 @@ MSG
   fi
 fi
 
+# ── 0.5. 글로벌 계획 강제 토글 확인
+if $_HAS_CONFIG 2>/dev/null; then
+  GLOBAL_REQUIRE=$(cfg_get_general "require_plan" 2>/dev/null)
+  if [ "$GLOBAL_REQUIRE" = "false" ]; then
+    exit 0
+  fi
+fi
+
 # ── 1. 키워드 매칭
 KEYWORD_TYPE=$(match_keywords "$PROMPT")
 if [ "$KEYWORD_TYPE" = "none" ]; then

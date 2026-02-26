@@ -208,6 +208,56 @@ cfg_get_code_pattern() {
   ' "$CONFIG_FILE"
 }
 
+# intents 섹션의 의도 이름 목록 추출: cfg_list_intents → "new_feature bugfix refactor ..."
+cfg_list_intents() {
+  local CONFIG_FILE=$(_find_config)
+  [ -z "$CONFIG_FILE" ] && return 1
+
+  awk '
+    BEGIN { in_intents=0 }
+    /^intents:/ { in_intents=1; next }
+    /^[a-z]/ && !/^intents:/ { if (in_intents) exit }
+    in_intents && /^  [a-z_]+:/ {
+      sub(/^  /, ""); gsub(/:.*/, "")
+      printf "%s ", $0
+    }
+  ' "$CONFIG_FILE"
+}
+
+# locations 섹션의 위치 이름 목록 추출: cfg_list_locations → "ui api service ..."
+cfg_list_locations() {
+  local CONFIG_FILE=$(_find_config)
+  [ -z "$CONFIG_FILE" ] && return 1
+
+  awk '
+    BEGIN { in_locations=0 }
+    /^locations:/ { in_locations=1; next }
+    /^[a-z]/ && !/^locations:/ { if (in_locations) exit }
+    in_locations && /^  [a-z_]+:/ {
+      sub(/^  /, ""); gsub(/:.*/, "")
+      printf "%s ", $0
+    }
+  ' "$CONFIG_FILE"
+}
+
+# general 섹션 값 읽기: cfg_get_general "require_plan" → "true"
+cfg_get_general() {
+  local KEY="$1"
+  local CONFIG_FILE=$(_find_config)
+  [ -z "$CONFIG_FILE" ] && return 1
+
+  awk -v key="$KEY" '
+    BEGIN { in_general=0 }
+    /^general:/ { in_general=1; next }
+    /^[a-z]/ && !/^general:/ { if (in_general) in_general=0 }
+    in_general && /^  [a-z_]+:/ {
+      sub(/^  /, "")
+      split($0, kv, ": "); k=kv[1]; gsub(/:$/, "", k)
+      if (k == key) { v=$0; sub(/^[^:]+: */, "", v); gsub(/^["'"'"']|["'"'"']$/, "", v); print v; exit }
+    }
+  ' "$CONFIG_FILE"
+}
+
 # 완료 검사 임계값 읽기
 cfg_get_threshold() {
   local KEY="$1"
