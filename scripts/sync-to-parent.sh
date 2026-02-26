@@ -12,8 +12,11 @@ echo "소스: $TEMPLATE_DIR"
 echo "대상: $PARENT_DIR"
 echo ""
 
-# .claude/ 동기화 (전체 덮어쓰기)
-rsync -av --delete "$TEMPLATE_DIR/.claude/" "$PARENT_DIR/.claude/"
+# .claude/ 동기화 (전체 덮어쓰기, 마커 파일 제외)
+rsync -av --delete \
+  --exclude='.initialized' \
+  --exclude='.setup-in-progress' \
+  "$TEMPLATE_DIR/.claude/" "$PARENT_DIR/.claude/"
 
 # docs/ 동기화 (작업 산출물은 보존)
 rsync -av --delete "$TEMPLATE_DIR/docs/" "$PARENT_DIR/docs/" \

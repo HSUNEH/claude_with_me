@@ -16,15 +16,7 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/matcher.sh"
 
-# ── 0. 스킬 커맨드 바이패스 (/setup, /plan-manager 등)
-# 슬래시로 시작하는 스킬 명령은 항상 통과시킨다.
-# 세팅 미완료 상태에서도 /setup을 실행할 수 있어야 하고,
-# 계획 미수립 상태에서도 /plan-manager를 실행할 수 있어야 한다.
-if echo "$PROMPT" | grep -qE '^\s*/[a-zA-Z]'; then
-  exit 0
-fi
-
-# ── 0.5. 초기 세팅 완료 확인
+# ── 0. 초기 세팅 완료 확인 (스킬 바이패스보다 먼저 체크)
 INIT_MARKER="$CWD/.claude/.initialized"
 SETUP_IN_PROGRESS="$CWD/.claude/.setup-in-progress"
 if [ ! -f "$INIT_MARKER" ]; then
@@ -34,6 +26,10 @@ if [ ! -f "$INIT_MARKER" ]; then
   fi
   # .claude/ 디렉토리가 존재하는데 .initialized가 없으면 = 세팅 미완료
   if [ -d "$CWD/.claude/hooks" ]; then
+    # /setup 명령만 허용, 나머지는 모두 차단
+    if echo "$PROMPT" | grep -qE '^\s*/setup(\s|$)'; then
+      exit 0
+    fi
     cat >&2 <<'MSG'
 ───────────────────────────────────────────
 ⛔ [세팅 미완료] /setup이 아직 완료되지 않았습니다
@@ -48,6 +44,12 @@ if [ ! -f "$INIT_MARKER" ]; then
 MSG
     exit 2
   fi
+fi
+
+# ── 0.5. 스킬 커맨드 바이패스 (/plan-manager, /dev-manual 등)
+# setup 완료 후에는 슬래시로 시작하는 스킬 명령을 통과시킨다.
+if echo "$PROMPT" | grep -qE '^\s*/[a-zA-Z]'; then
+  exit 0
 fi
 
 # ── 1. 글로벌 계획 강제 토글 확인
