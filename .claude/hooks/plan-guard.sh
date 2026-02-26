@@ -16,6 +16,26 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/matcher.sh"
 
+# ── 0. 초기 세팅 완료 확인
+INIT_MARKER="$CWD/.claude/.initialized"
+if [ ! -f "$INIT_MARKER" ]; then
+  # .claude/ 디렉토리가 존재하는데 .initialized가 없으면 = 세팅 미완료
+  if [ -d "$CWD/.claude/hooks" ]; then
+    cat <<'MSG'
+───────────────────────────────────────────
+⛔ [세팅 미완료] /setup이 아직 끝나지 않았습니다
+───────────────────────────────────────────
+
+.claude/.initialized 마커가 없습니다.
+/setup의 Phase 5까지 완료해야 개발을 시작할 수 있습니다.
+
+👉 /setup 을 실행하여 세팅을 완료하세요.
+───────────────────────────────────────────
+MSG
+    exit 0
+  fi
+fi
+
 # ── 1. 키워드 매칭
 KEYWORD_TYPE=$(match_keywords "$PROMPT")
 if [ "$KEYWORD_TYPE" = "none" ]; then
