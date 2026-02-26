@@ -1,53 +1,52 @@
 # 챕터 5: 보안
 
-> [!NOTE]
-> 이 파일은 템플릿입니다. 프로젝트 보안 정책에 맞게 수정하세요.
+## 이 프로젝트의 보안 범위
 
-## 보안 원칙
+dev-sys-template은 로컬 CLI 도구(Claude Code)의 Hook/Skill 시스템이므로, 웹 앱 수준의 보안(인증/인가, CSRF 등)은 해당하지 않는다.
 
-1. **최소 권한 원칙**: 필요한 권한만 부여
-2. **입력은 항상 의심**: 모든 사용자 입력 검증 필수
-3. **비밀 정보 코드에 금지**: 환경변수로 관리
-4. **방어적 코딩**: 모든 외부 데이터는 신뢰하지 않음
+대신 아래 항목에 집중한다.
 
-## 입력 검증
+## Shell 스크립트 보안
 
-```typescript
-// Zod 스키마로 입력 검증
-const createUserSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(2).max(50),
-  password: z.string().min(8).regex(/^(?=.*[A-Za-z])(?=.*\d)/),
-});
+### 입력 검증
+
+```bash
+# DO: jq로 안전하게 JSON 파싱
+PROMPT=$(echo "$INPUT" | jq -r '.prompt // empty')
+
+# DON'T: eval이나 직접 변수 대입
+eval "PROMPT=$INPUT"
 ```
 
-## 보안 체크리스트
+### 경로 처리
 
-### 인증/인가
-- [ ] JWT 토큰 만료 시간 적절한가?
-- [ ] 민감 API에 인가 미들웨어 적용했는가?
-- [ ] CORS 설정이 적절한가?
+```bash
+# DO: 변수를 큰따옴표로 감싸기
+if [ -f "$CHECKLIST_FILE" ]; then
 
-### 데이터 보호
-- [ ] SQL Injection 방지 (파라미터 바인딩)?
-- [ ] XSS 방지 (입력 이스케이프)?
-- [ ] CSRF 토큰 적용했는가?
-- [ ] 비밀번호 해싱 처리했는가? (bcrypt/argon2)
+# DON'T: 따옴표 없이 사용 (공백 포함 경로에서 깨짐)
+if [ -f $CHECKLIST_FILE ]; then
+```
 
-### 환경 변수
-- [ ] `.env` 파일이 `.gitignore`에 포함되는가?
-- [ ] API 키가 클라이언트 코드에 노출되지 않는가?
-- [ ] 프로덕션과 개발 환경 분리되었는가?
+### 금지 패턴 (config.yml code_patterns에서 감지)
 
-### API 보안
-- [ ] Rate Limiting 적용했는가?
-- [ ] 요청 크기 제한 설정했는가?
-- [ ] 에러 응답에 스택트레이스가 노출되지 않는가?
+| 패턴 | 위험 | 대안 |
+|------|------|------|
+| `eval()` | 코드 인젝션 | 직접 실행 |
+| `innerHTML` | XSS | `textContent` 또는 프레임워크 바인딩 |
+| `exec()` | 명령 인젝션 | 화이트리스트 기반 실행 |
+| 하드코딩 비밀정보 | 유출 | 환경변수 |
 
-## 금지 사항
+## config.yml의 코드 패턴 감지
 
-- 하드코딩된 비밀번호/API 키
-- `eval()` 사용
-- `dangerouslySetInnerHTML` 무분별 사용
-- HTTP (HTTPS만 사용)
-- 암호화 없는 민감 데이터 저장
+```yaml
+code_patterns:
+  security_dangerous_functions:
+    pattern: "(eval\\(|innerHTML|exec\\()"
+    severity: "critical"
+  security_hardcoded_secrets:
+    pattern: "(password|secret|api_key)\\s*[:=]\\s*[\"']"
+    severity: "critical"
+```
+
+이 패턴들은 `post-tool-check.sh`와 `completion-checker.sh`에서 자동 감지된다.

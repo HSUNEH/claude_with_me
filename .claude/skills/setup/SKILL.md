@@ -24,6 +24,16 @@ user-invocable: true
 
 > **목표**: 이 프로젝트가 뭘 하는 건지, 어디까지 만들 건지 파악
 
+### 시작 전 준비
+
+Phase 1 시작 메시지를 출력하기 **직전에** 반드시 `.setup-in-progress` 마커를 생성한다:
+
+```bash
+touch .claude/.setup-in-progress
+```
+
+이 마커가 있어야 setup 진행 중 사용자의 답변이 plan-guard 훅에 차단되지 않는다.
+
 ### 시작 메시지
 
 ```
@@ -450,6 +460,7 @@ model: sonnet
 
 ```bash
 touch .claude/.initialized
+rm -f .claude/.setup-in-progress
 ```
 
 첫 번째 기능의 CHECKLIST.md 상태를 `🔴 시작 전` → `🟡 진행 중`으로 변경한다.

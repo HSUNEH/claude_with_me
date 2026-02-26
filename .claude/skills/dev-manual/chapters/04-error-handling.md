@@ -1,62 +1,78 @@
 # 챕터 4: 에러 처리
 
-> [!NOTE]
-> 이 파일은 템플릿입니다. 프로젝트 에러 처리 정책에 맞게 수정하세요.
+## Shell 스크립트 에러 처리
 
-## 에러 처리 원칙
+### 종료 코드 규칙
 
-1. **모든 외부 호출에 try-catch**: API, DB, 파일 I/O 등
-2. **에러는 삼키지 말것**: catch에서 최소한 로깅 필수
-3. **사용자 친화적 메시지**: 내부 에러를 그대로 노출하지 않기
-4. **에러 경계 설정**: 컴포넌트 단위 ErrorBoundary 활용
-
-## 에러 분류 체계
-
-```typescript
-// 커스텀 에러 클래스
-class AppError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public statusCode: number = 500,
-    public isOperational: boolean = true
-  ) {
-    super(message);
-  }
-}
-
-// 사용 예시
-throw new AppError('사용자를 찾을 수 없습니다', 'USER_NOT_FOUND', 404);
-```
-
-## API 에러 응답 형식
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "이메일 형식이 올바르지 않습니다",
-    "details": [
-      { "field": "email", "message": "유효한 이메일을 입력하세요" }
-    ]
-  }
-}
-```
-
-## 로깅 레벨
-
-| 레벨 | 용도 | 예시 |
+| 코드 | 의미 | 용도 |
 |------|------|------|
-| ERROR | 즉시 대응 필요 | DB 연결 실패, 결제 오류 |
-| WARN | 주의 필요 | 느린 쿼리, 재시도 성공 |
-| INFO | 주요 흐름 기록 | 사용자 로그인, 주문 생성 |
-| DEBUG | 디버깅용 (개발만) | 변수 값, 함수 호출 추적 |
+| `exit 0` | 성공/통과 | Hook이 안내 메시지를 출력하고 정상 진행 |
+| `exit 2` | 차단 | Hook이 작업을 차단하고 에러 메시지 표시 |
 
-## 필수 에러 처리 체크리스트
+### 안전한 스크립트 시작
 
-- [ ] 네트워크 요청에 타임아웃 설정했는가?
-- [ ] 실패 시 재시도 로직이 필요한가?
-- [ ] 사용자에게 적절한 에러 메시지를 보여주는가?
-- [ ] 에러 로그에 충분한 컨텍스트가 포함되는가?
-- [ ] 민감 정보가 에러 메시지에 노출되지 않는가?
+```bash
+# sync 스크립트 등 유틸리티
+set -euo pipefail
+
+# Hook 스크립트는 set -e 사용하지 않음 (grep 실패 등이 정상 흐름)
+```
+
+### 에러 출력 분리
+
+```bash
+# 차단 메시지 → stderr (Claude Code가 에러로 인식)
+cat >&2 <<'MSG'
+⛔ [에러] 내용
+MSG
+exit 2
+
+# 안내 메시지 → stdout (Claude Code가 정보로 인식)
+cat <<'MSG'
+📋 [안내] 내용
+MSG
+exit 0
+```
+
+### 방어적 파일 접근
+
+```bash
+# DO: 파일 존재 확인 후 접근
+[ -f "$checklist" ] || continue
+if grep -q "🟡 진행 중" "$checklist" 2>/dev/null; then
+
+# DO: 디렉토리 존재 확인
+if [ ! -d "$PLANS_DIR" ]; then
+
+# DON'T: 존재 확인 없이 바로 접근
+grep "패턴" "$file"
+```
+
+### config.yml 폴백 패턴
+
+```bash
+# config에서 읽기 시도 → 실패하면 내장 기본값
+if $_HAS_CONFIG 2>/dev/null; then
+  VALUE=$(cfg_get "section" "key" 2>/dev/null)
+fi
+if [ -z "$VALUE" ]; then
+  VALUE="기본값"
+fi
+```
+
+## 에러 메시지 형식
+
+```
+───────────────────────────────────────────
+⛔/⚠️/📋 [카테고리] 제목
+───────────────────────────────────────────
+
+상세 설명
+
+💡 해결 방법 안내
+───────────────────────────────────────────
+```
+
+- ⛔: 차단 (exit 2)
+- ⚠️: 경고 (exit 0, 안내만)
+- 📋: 정보 (exit 0, 컨텍스트 안내)
