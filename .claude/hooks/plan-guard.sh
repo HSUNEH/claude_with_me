@@ -123,17 +123,24 @@ fi
 # 체크리스트 상태별 분류
 IN_PROGRESS=""
 PENDING_APPROVAL=""
+ALL_COMPLETED=true
 for checklist in "$PLANS_DIR"/*/CHECKLIST.md; do
   [ -f "$checklist" ] || continue
   if grep -q "🟡 진행 중" "$checklist" 2>/dev/null; then
     PLAN_DIR=$(dirname "$checklist")
     PLAN_NAME=$(basename "$PLAN_DIR")
     IN_PROGRESS="$PLAN_NAME"
+    ALL_COMPLETED=false
     break
   elif grep -q "🔴 시작 전" "$checklist" 2>/dev/null; then
     PLAN_DIR=$(dirname "$checklist")
     PLAN_NAME=$(basename "$PLAN_DIR")
     PENDING_APPROVAL="$PLAN_NAME"
+    ALL_COMPLETED=false
+  elif grep -q "🟢 완료" "$checklist" 2>/dev/null; then
+    : # 완료 상태 — ALL_COMPLETED 유지
+  else
+    ALL_COMPLETED=false
   fi
 done
 
@@ -206,17 +213,16 @@ MSG
 ───────────────────────────────────────────
 MSG
 else
-  PLAN_COUNT=$(find "$PLANS_DIR" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l)
-
-  cat <<MSG
+  # ── 활성 계획 없음: 모두 🟢 완료이거나 계획 자체가 비어있음
+  cat <<'MSG'
 ───────────────────────────────────────────
-📋 [계획 관리] 기존 계획 ${PLAN_COUNT}건 존재
+⚠️ [계획 관리] 진행 중인 계획이 없습니다
 ───────────────────────────────────────────
 
-현재 진행 중인 작업은 없습니다.
+새 작업을 시작하려면 계획을 먼저 수립하세요.
 
-→ 기존 계획을 이어서 하려면: docs/plans/ 확인
-→ 새 작업이라면: /plan-manager로 계획 수립 먼저
+👉 /plan-manager 를 실행하여 3문서를 생성하세요.
+   계획 승인 후 작업을 시작합니다.
 ───────────────────────────────────────────
 MSG
 fi

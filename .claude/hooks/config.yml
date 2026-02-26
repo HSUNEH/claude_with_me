@@ -52,13 +52,20 @@ intents:
     patterns: "테스트|test|spec|검증|커버리지|coverage"
     label: "테스트 작업"
     chapters: "6(테스트)"
-    require_plan: false     # 테스트는 계획 없이도 진행 가능
+    require_plan: false     # 테스트는 계획 없이도 진행 가능 (단독 테스트 작성 등)
 
   docs:
     patterns: "문서|doc|readme|가이드|설명서|주석|comment"
     label: "문서 작업"
     chapters: "1(프로젝트 개요)"
     require_plan: false     # 문서 작업도 계획 없이 진행 가능
+
+# ⚠️ require_plan 설정 가이드:
+#   true  = 계획 필수. 진행 중인 계획(🟡)이 없으면 /plan-manager 강제
+#   false = 계획 없이 진행 가능. 단, 진행 중 계획이 있으면 안내는 표시
+#
+#   새 의도를 추가할 때, 코드 변경이 수반되는 작업이면 true를 권장합니다.
+#   false는 테스트, 문서 등 독립적이고 범위가 작은 작업에만 사용하세요.
 
 
 # ─── 3. 작업 위치 (파일 경로 → 도메인 감지) ─────────────────
