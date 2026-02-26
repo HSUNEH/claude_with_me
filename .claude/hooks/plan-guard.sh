@@ -29,22 +29,15 @@ INIT_MARKER="$CWD/.claude/.initialized"
 if [ ! -f "$INIT_MARKER" ]; then
   # .claude/ 디렉토리가 존재하는데 .initialized가 없으면 = 세팅 미완료
   if [ -d "$CWD/.claude/hooks" ]; then
-    cat >&2 <<'MSG'
+    cat <<'MSG'
 ───────────────────────────────────────────
-⛔ [세팅 미완료] /setup이 아직 끝나지 않았습니다
+⚠️ [세팅 미완료] /setup이 아직 완료되지 않았습니다
 ───────────────────────────────────────────
 
-.claude/.initialized 마커가 없습니다.
-/setup의 Phase 5까지 완료해야 개발을 시작할 수 있습니다.
-
-👉 /setup 을 실행하여 세팅을 완료하세요.
-
-💡 GitHub에서 설치한 직후라면:
-   Claude Code를 한번 종료(/exit)한 뒤 다시 시작하세요.
-   재시작해야 /setup 스킬이 인식됩니다.
+💡 /setup 을 실행하여 세팅을 완료하면 체계적으로 작업할 수 있습니다.
 ───────────────────────────────────────────
 MSG
-    exit 2
+    exit 0
   fi
 fi
 
