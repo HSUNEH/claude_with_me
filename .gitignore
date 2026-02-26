@@ -1,0 +1,5 @@
+# 설치된 개발 시스템 사본 (런타임용, git 추적 제외)
+/.claude/
+/docs/
+/CLAUDE.md
+.DS_Store
