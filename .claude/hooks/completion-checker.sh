@@ -156,17 +156,4 @@ MSG
 MSG
 fi
 
-# ── C. 작업 로그 마감 리마인더 (계획 없는 간단 작업) ──
-WORK_LOG="$CWD/docs/logs/work-log.md"
-if [ -f "$WORK_LOG" ]; then
-  if grep -q "🔵 진행 중" "$WORK_LOG" 2>/dev/null; then
-    echo ""
-    echo "───────────────────────────────────────────"
-    echo "📝 [작업 로그] 진행 중 항목이 있습니다"
-    echo "───────────────────────────────────────────"
-    echo "→ docs/logs/work-log.md의 🔵 진행 중 → ✅ 완료 로 변경하세요."
-    echo "───────────────────────────────────────────"
-  fi
-fi
-
 exit 0
