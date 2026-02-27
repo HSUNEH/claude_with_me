@@ -19,6 +19,46 @@ source "$SCRIPT_DIR/lib/matcher.sh"
 if [[ "$TOOL_NAME" == "Edit" || "$TOOL_NAME" == "Write" ]]; then
   FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.path // empty')
 
+  # ── 0. 계획 없는 코드 변경 감지
+  # docs/, .claude/ 등 비코드 파일은 제외
+  _IS_CODE_FILE=true
+  case "$FILE_PATH" in
+    */docs/*|*/plans/*|*/logs/*|*/reports/*|*CHECKLIST*|*PLAN.md|*CONTEXT.md|*CLAUDE.md|*.md)
+      _IS_CODE_FILE=false
+      ;;
+  esac
+
+  if $_IS_CODE_FILE; then
+    PLANS_DIR="$CWD/docs/plans"
+    if [ -d "$PLANS_DIR" ]; then
+      _HAS_ACTIVE=false
+      _HAS_COMPLETED=false
+      for _cl in "$PLANS_DIR"/*/CHECKLIST.md; do
+        [ -f "$_cl" ] || continue
+        if grep -q "🟡 진행 중" "$_cl" 2>/dev/null; then
+          _HAS_ACTIVE=true
+          break
+        elif grep -q "🟢 완료" "$_cl" 2>/dev/null; then
+          _HAS_COMPLETED=true
+        fi
+      done
+
+      if ! $_HAS_ACTIVE && $_HAS_COMPLETED; then
+        cat <<'WARN'
+───────────────────────────────────────────
+⚠️ [무계획 변경 감지] 활성 계획 없이 코드가 변경되었습니다
+───────────────────────────────────────────
+
+모든 계획이 🟢 완료 상태인데 코드 파일이 수정되었습니다.
+
+→ 추가 변경을 계속하기 전에 AskUserQuestion으로 사용자에게 확인하세요.
+→ 필요하다면 /plan-manager로 새 계획을 수립하세요.
+───────────────────────────────────────────
+WARN
+      fi
+    fi
+  fi
+
   # 3. 작업 위치 감지 → 맞춤형 검사 중점
   LOCATION=$(detect_location "$FILE_PATH")
   FOCUS=$(location_to_focus "$LOCATION")

@@ -7,13 +7,13 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/plan-guard.sh",
-            "timeout": 5000,
+            "timeout": 10000,
             "statusMessage": "📋 계획 확인 중..."
           },
           {
             "type": "command",
             "command": "bash .claude/hooks/pre-prompt-check.sh",
-            "timeout": 5000,
+            "timeout": 10000,
             "statusMessage": "📖 매뉴얼 체크 중..."
           }
         ]

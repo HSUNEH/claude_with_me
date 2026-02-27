@@ -12,9 +12,16 @@ INPUT=$(cat)
 PROMPT=$(echo "$INPUT" | jq -r '.prompt // empty')
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 
-# 매칭 유틸리티 로드
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$SCRIPT_DIR/lib/matcher.sh"
+
+# 에러 시 안전한 폴백 — hook crash로 프롬프트 차단되지 않도록
+trap 'exit 0' ERR
+
+# 매칭 유틸리티 로드 (실패 시 안전 종료)
+if ! source "$SCRIPT_DIR/lib/matcher.sh" 2>/dev/null; then
+  echo "[plan-guard] 매칭 라이브러리 로드 실패 — 바이패스" >&2
+  exit 0
+fi
 
 # ── 0. 초기 세팅 완료 확인 (스킬 바이패스보다 먼저 체크)
 INIT_MARKER="$CWD/.claude/.initialized"
@@ -52,11 +59,52 @@ if echo "$PROMPT" | grep -qE '^\s*/[a-zA-Z]'; then
   exit 0
 fi
 
+# ── 0.6. 간단 작업 바이패스 (계획 없이 즉시 진행)
+# "간단:", "직접:", "바로:" 접두사로 시작하면 계획 강제를 건너뜀
+if echo "$PROMPT" | grep -qE '^\s*(간단|직접|바로)\s*[:：]'; then
+  exit 0
+fi
+
 # ── 1. 글로벌 계획 강제 토글 확인
 if $_HAS_CONFIG 2>/dev/null; then
   GLOBAL_REQUIRE=$(cfg_get_general "require_plan" 2>/dev/null)
   if [ "$GLOBAL_REQUIRE" = "false" ]; then
     exit 0
+  fi
+fi
+
+# ── 1.5. 짧은 프롬프트 + 완료 상태 감지 (코드 변경 확인 유도)
+PROMPT_TRIMMED=$(echo "$PROMPT" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+PROMPT_LEN=${#PROMPT_TRIMMED}
+
+if [ "$PROMPT_LEN" -le 20 ]; then
+  PLANS_DIR="$CWD/docs/plans"
+  if [ -d "$PLANS_DIR" ]; then
+    _HAS_ACTIVE=false
+    _HAS_COMPLETED=false
+    for _cl in "$PLANS_DIR"/*/CHECKLIST.md; do
+      [ -f "$_cl" ] || continue
+      if grep -q "🟡 진행 중" "$_cl" 2>/dev/null; then
+        _HAS_ACTIVE=true
+        break
+      elif grep -q "🟢 완료" "$_cl" 2>/dev/null; then
+        _HAS_COMPLETED=true
+      fi
+    done
+
+    if ! $_HAS_ACTIVE && $_HAS_COMPLETED; then
+      cat <<'MSG'
+[시스템 지시] 짧은 응답이 감지되었으며, 활성 계획이 없습니다 (모든 계획 🟢 완료).
+
+⚠️ 코드 변경이 필요한 상황이라면 바로 실행하지 마세요.
+반드시 AskUserQuestion 도구로 사용자에게 먼저 확인하세요:
+→ "간단한 작업인데 /plan-manager 없이 바로 진행할까요?"
+  선택지: "바로 진행" / "/plan-manager로 계획 수립"
+
+단순 대화(질문 답변, 설명 등)는 그대로 진행하세요.
+MSG
+      exit 0
+    fi
   fi
 fi
 
@@ -228,21 +276,36 @@ MSG
 ───────────────────────────────────────────
 MSG
 else
-  # ── 활성 계획 없음: 항상 사용자에게 확인 후 진행
+  # ── 활성 계획 없음: 안내 후 사용자 확인 유도 (exit 0)
   DETECTED_INTENT=$(detect_intent "$PROMPT")
   INTENT_LABEL=$(intent_to_label "$DETECTED_INTENT")
-  cat <<MSG
-[시스템 지시] 진행 중인 계획이 없습니다.
-사용자가 "${INTENT_LABEL}" 작업을 요청했습니다.
 
-바로 코드를 작성하지 마세요. 반드시 사용자에게 먼저 확인하세요:
+  if $ALL_COMPLETED; then
+    cat <<MSG
+[시스템 지시] 모든 계획이 완료된 상태에서 새 작업 요청이 감지되었습니다.
+감지된 의도: "${INTENT_LABEL}"
+
+⚠️ 바로 코드를 작성하지 마세요. 반드시 사용자에게 먼저 확인하세요:
 1. 요청의 복잡도를 판단한다.
-2. 사용자에게 다음과 같이 물어본다:
-   - 간단한 작업이면: "간단한 작업으로 보입니다. 바로 진행할까요, 아니면 /plan-manager로 계획을 수립할까요?"
-   - 복잡한 작업이면: "복잡한 작업으로 보입니다. /plan-manager로 계획을 먼저 수립하겠습니다. 진행할까요?"
-3. 사용자가 응답할 때까지 기다린다.
-4. 사용자의 선택에 따라 진행한다.
+2. AskUserQuestion 도구로 사용자에게 물어본다:
+   - "새로운 작업으로 보입니다. 어떻게 진행할까요?"
+   - 선택지: "바로 진행", "/plan-manager로 계획 수립"
+3. 사용자의 선택에 따라 진행한다.
 MSG
+  else
+    cat <<MSG
+[시스템 지시] 진행 중인 계획이 없습니다.
+감지된 의도: "${INTENT_LABEL}"
+
+⚠️ 바로 코드를 작성하지 마세요. 반드시 사용자에게 먼저 확인하세요:
+1. 요청의 복잡도를 판단한다.
+2. AskUserQuestion 도구로 사용자에게 물어본다:
+   - 간단한 작업이면: "간단한 작업으로 보입니다. 바로 진행할까요?"
+   - 복잡한 작업이면: "복잡한 작업으로 보입니다. /plan-manager로 계획을 먼저 수립할까요?"
+   - 선택지: "바로 진행", "/plan-manager로 계획 수립"
+3. 사용자의 선택에 따라 진행한다.
+MSG
+  fi
   exit 0
 fi
 
