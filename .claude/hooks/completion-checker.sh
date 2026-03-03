@@ -21,8 +21,67 @@ if [ ! -f "$LOG_FILE" ]; then
   exit 0
 fi
 
-# 최근 변경된 파일 목록 추출
-CHANGED_FILES=$(tail -20 "$LOG_FILE" | grep -oP '`[^`]+\.[a-z]+`' | tr -d '`' | sort -u)
+# ── 0. 같은 턴 계획+구현 위반 감지 (CHANGED_FILES 추출 전에 실행) ──
+RECENT_LOG=$(tail -30 "$LOG_FILE")
+HAS_PLAN_WRITE=false
+HAS_CODE_CHANGE=false
+PLAN_TS=""
+CODE_TS=""
+
+# 계획 문서 Write/Edit 감지 (docs/plans/ 하위의 PLAN.md, CONTEXT.md, CHECKLIST.md)
+PLAN_LINE=$(echo "$RECENT_LOG" | grep -E '\| (Write|Edit) \|' | grep -E '/(PLAN|CONTEXT|CHECKLIST)\.md' | grep -E '/docs/plans/' | tail -1)
+if [ -n "$PLAN_LINE" ]; then
+  HAS_PLAN_WRITE=true
+  PLAN_TS=$(echo "$PLAN_LINE" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}' | head -1)
+fi
+
+# 비문서 코드 파일 Edit/Write 감지 (docs/, plans/, logs/, reports/ 제외)
+CODE_LINE=$(echo "$RECENT_LOG" | grep -E '\| (Edit|Write) \|' | grep -vE '/(docs/|plans/|logs/|reports/)' | grep -vE '/(CHECKLIST|PLAN|CONTEXT|CLAUDE)\.md' | tail -1)
+if [ -n "$CODE_LINE" ]; then
+  HAS_CODE_CHANGE=true
+  CODE_TS=$(echo "$CODE_LINE" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}' | head -1)
+fi
+
+SAME_TURN_VIOLATION=false
+if $HAS_PLAN_WRITE && $HAS_CODE_CHANGE && [ -n "$PLAN_TS" ] && [ -n "$CODE_TS" ]; then
+  # macOS/Linux 호환 epoch 변환
+  if date -j &>/dev/null 2>&1; then
+    # macOS
+    PLAN_EPOCH=$(date -j -f "%Y-%m-%d %H:%M:%S" "$PLAN_TS" +%s 2>/dev/null || echo 0)
+    CODE_EPOCH=$(date -j -f "%Y-%m-%d %H:%M:%S" "$CODE_TS" +%s 2>/dev/null || echo 0)
+  else
+    # Linux
+    PLAN_EPOCH=$(date -d "$PLAN_TS" +%s 2>/dev/null || echo 0)
+    CODE_EPOCH=$(date -d "$CODE_TS" +%s 2>/dev/null || echo 0)
+  fi
+
+  if [ "$PLAN_EPOCH" -gt 0 ] && [ "$CODE_EPOCH" -gt 0 ]; then
+    DIFF=$(( CODE_EPOCH - PLAN_EPOCH ))
+    [ $DIFF -lt 0 ] && DIFF=$(( -DIFF ))
+    if [ $DIFF -le 600 ]; then
+      SAME_TURN_VIOLATION=true
+    fi
+  fi
+fi
+
+if $SAME_TURN_VIOLATION; then
+  cat <<'VIOLATION'
+───────────────────────────────────────────
+🚨 [워크플로우 위반] 같은 턴에서 계획 수립과 코드 구현이 감지되었습니다
+───────────────────────────────────────────
+
+계획 문서 생성과 코드 파일 수정이 동일 턴에 발생했습니다.
+
+정상 절차: 계획 승인 → /clear → 구현 시작
+실제 발생: 계획 승인 → 바로 구현 (⚠️ /clear 생략)
+
+→ 다음부터 계획 승인 후 반드시 /clear를 거쳐 컨텍스트를 정리하세요.
+───────────────────────────────────────────
+VIOLATION
+fi
+
+# 최근 변경된 파일 목록 추출 (macOS 호환: -oE 사용)
+CHANGED_FILES=$(tail -20 "$LOG_FILE" | grep -oE '`[^`]+\.[a-z]+`' | tr -d '`' | sort -u)
 
 if [ -z "$CHANGED_FILES" ]; then
   exit 0
