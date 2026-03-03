@@ -10,61 +10,41 @@
 INPUT=$(cat)
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 
-# 매칭 유틸리티 로드
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/matcher.sh"
 
 LOG_FILE="$CWD/docs/logs/change-log.md"
 
-# 변경 로그가 없으면 스킵
-if [ ! -f "$LOG_FILE" ]; then
-  exit 0
-fi
+# ── 함수 정의 ──
 
-# ── 0. 같은 턴 계획+구현 위반 감지 (CHANGED_FILES 추출 전에 실행) ──
-RECENT_LOG=$(tail -30 "$LOG_FILE")
-HAS_PLAN_WRITE=false
-HAS_CODE_CHANGE=false
-PLAN_TS=""
-CODE_TS=""
+_check_same_turn_violation() {
+  local RECENT_LOG=$(tail -30 "$LOG_FILE")
 
-# 계획 문서 Write/Edit 감지 (docs/plans/ 하위의 PLAN.md, CONTEXT.md, CHECKLIST.md)
-PLAN_LINE=$(echo "$RECENT_LOG" | grep -E '\| (Write|Edit) \|' | grep -E '/(PLAN|CONTEXT|CHECKLIST)\.md' | grep -E '/docs/plans/' | tail -1)
-if [ -n "$PLAN_LINE" ]; then
-  HAS_PLAN_WRITE=true
-  PLAN_TS=$(echo "$PLAN_LINE" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}' | head -1)
-fi
+  local PLAN_LINE=$(echo "$RECENT_LOG" | grep -E '\| (Write|Edit) \|' | grep -E '/(PLAN|CONTEXT|CHECKLIST)\.md' | grep -E '/docs/plans/' | tail -1)
+  [ -z "$PLAN_LINE" ] && return 1
 
-# 비문서 코드 파일 Edit/Write 감지 (docs/, plans/, logs/, reports/ 제외)
-CODE_LINE=$(echo "$RECENT_LOG" | grep -E '\| (Edit|Write) \|' | grep -vE '/(docs/|plans/|logs/|reports/)' | grep -vE '/(CHECKLIST|PLAN|CONTEXT|CLAUDE)\.md' | tail -1)
-if [ -n "$CODE_LINE" ]; then
-  HAS_CODE_CHANGE=true
-  CODE_TS=$(echo "$CODE_LINE" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}' | head -1)
-fi
+  local CODE_LINE=$(echo "$RECENT_LOG" | grep -E '\| (Edit|Write) \|' | grep -vE '/(docs/|plans/|logs/|reports/)' | grep -vE '/(CHECKLIST|PLAN|CONTEXT|CLAUDE)\.md' | tail -1)
+  [ -z "$CODE_LINE" ] && return 1
 
-SAME_TURN_VIOLATION=false
-if $HAS_PLAN_WRITE && $HAS_CODE_CHANGE && [ -n "$PLAN_TS" ] && [ -n "$CODE_TS" ]; then
-  # macOS/Linux 호환 epoch 변환
+  local PLAN_TS=$(echo "$PLAN_LINE" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}' | head -1)
+  local CODE_TS=$(echo "$CODE_LINE" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}' | head -1)
+  [ -z "$PLAN_TS" ] || [ -z "$CODE_TS" ] && return 1
+
+  local PLAN_EPOCH CODE_EPOCH
   if date -j &>/dev/null 2>&1; then
-    # macOS
     PLAN_EPOCH=$(date -j -f "%Y-%m-%d %H:%M:%S" "$PLAN_TS" +%s 2>/dev/null || echo 0)
     CODE_EPOCH=$(date -j -f "%Y-%m-%d %H:%M:%S" "$CODE_TS" +%s 2>/dev/null || echo 0)
   else
-    # Linux
     PLAN_EPOCH=$(date -d "$PLAN_TS" +%s 2>/dev/null || echo 0)
     CODE_EPOCH=$(date -d "$CODE_TS" +%s 2>/dev/null || echo 0)
   fi
 
-  if [ "$PLAN_EPOCH" -gt 0 ] && [ "$CODE_EPOCH" -gt 0 ]; then
-    DIFF=$(( CODE_EPOCH - PLAN_EPOCH ))
-    [ $DIFF -lt 0 ] && DIFF=$(( -DIFF ))
-    if [ $DIFF -le 600 ]; then
-      SAME_TURN_VIOLATION=true
-    fi
-  fi
-fi
+  [ "$PLAN_EPOCH" -le 0 ] || [ "$CODE_EPOCH" -le 0 ] && return 1
 
-if $SAME_TURN_VIOLATION; then
+  local DIFF=$(( CODE_EPOCH - PLAN_EPOCH ))
+  [ $DIFF -lt 0 ] && DIFF=$(( -DIFF ))
+  [ $DIFF -gt 600 ] && return 1
+
   cat <<'VIOLATION'
 ───────────────────────────────────────────
 🚨 [워크플로우 위반] 같은 턴에서 계획 수립과 코드 구현이 감지되었습니다
@@ -78,34 +58,47 @@ if $SAME_TURN_VIOLATION; then
 → 다음부터 계획 승인 후 반드시 /clear를 거쳐 컨텍스트를 정리하세요.
 ───────────────────────────────────────────
 VIOLATION
-fi
+}
 
-# 최근 변경된 파일 목록 추출 (macOS 호환: -oE 사용)
-CHANGED_FILES=$(tail -20 "$LOG_FILE" | grep -oE '`[^`]+\.[a-z]+`' | tr -d '`' | sort -u)
+_run_lint_checks() {
+  # TypeScript/JavaScript
+  if command -v npx &>/dev/null; then
+    if [ -f "$CWD/node_modules/.bin/eslint" ] || ls "$CWD"/.eslintrc* "$CWD"/eslint.config* 2>/dev/null | head -1 >/dev/null 2>&1; then
+      for f in $CHANGED_FILES; do
+        if [[ "$f" == *.ts || "$f" == *.tsx || "$f" == *.js || "$f" == *.jsx ]]; then
+          local TARGET="$f"
+          [ ! -f "$TARGET" ] && TARGET="$CWD/$f"
+          if [ -f "$TARGET" ]; then
+            local LINT_RESULT=$(cd "$CWD" && npx eslint "$TARGET" --no-color 2>&1 | tail -5)
+            if [ -n "$LINT_RESULT" ] && echo "$LINT_RESULT" | grep -qiE "(error|warning)"; then
+              ERRORS="${ERRORS}\n[ESLint] ${f}:\n${LINT_RESULT}\n"
+              ERROR_COUNT=$((ERROR_COUNT + 1))
+            fi
+          fi
+        fi
+      done
+    fi
 
-if [ -z "$CHANGED_FILES" ]; then
-  exit 0
-fi
+    if [ -f "$CWD/tsconfig.json" ]; then
+      local TSC_RESULT=$(cd "$CWD" && npx tsc --noEmit 2>&1 | tail -10)
+      if echo "$TSC_RESULT" | grep -qiE "error TS"; then
+        local TSC_COUNT=$(echo "$TSC_RESULT" | grep -c "error TS")
+        ERRORS="${ERRORS}\n[TypeScript] 타입 에러 ${TSC_COUNT}건:\n${TSC_RESULT}\n"
+        ERROR_COUNT=$((ERROR_COUNT + TSC_COUNT))
+      fi
+    fi
+  fi
 
-# ── 검사 결과 수집 ──
-ERRORS=""
-ERROR_COUNT=0
-PATTERN_WARNINGS=""
-PATTERN_COUNT=0
-
-# ── A. 린트/타입 자동 검사 (기존) ──
-
-# TypeScript/JavaScript
-if command -v npx &>/dev/null; then
-  if [ -f "$CWD/node_modules/.bin/eslint" ] || ls "$CWD"/.eslintrc* "$CWD"/eslint.config* 2>/dev/null | head -1 >/dev/null 2>&1; then
+  # Python
+  if command -v python3 &>/dev/null; then
     for f in $CHANGED_FILES; do
-      if [[ "$f" == *.ts || "$f" == *.tsx || "$f" == *.js || "$f" == *.jsx ]]; then
-        TARGET="$f"
+      if [[ "$f" == *.py ]]; then
+        local TARGET="$f"
         [ ! -f "$TARGET" ] && TARGET="$CWD/$f"
         if [ -f "$TARGET" ]; then
-          LINT_RESULT=$(cd "$CWD" && npx eslint "$TARGET" --no-color 2>&1 | tail -5)
-          if [ -n "$LINT_RESULT" ] && echo "$LINT_RESULT" | grep -qiE "(error|warning)"; then
-            ERRORS="${ERRORS}\n[ESLint] ${f}:\n${LINT_RESULT}\n"
+          local PY_RESULT=$(python3 -m py_compile "$TARGET" 2>&1)
+          if [ $? -ne 0 ]; then
+            ERRORS="${ERRORS}\n[Python] ${f}:\n${PY_RESULT}\n"
             ERROR_COUNT=$((ERROR_COUNT + 1))
           fi
         fi
@@ -113,56 +106,27 @@ if command -v npx &>/dev/null; then
     done
   fi
 
-  if [ -f "$CWD/tsconfig.json" ]; then
-    TSC_RESULT=$(cd "$CWD" && npx tsc --noEmit 2>&1 | tail -10)
-    if echo "$TSC_RESULT" | grep -qiE "error TS"; then
-      TSC_COUNT=$(echo "$TSC_RESULT" | grep -c "error TS")
-      ERRORS="${ERRORS}\n[TypeScript] 타입 에러 ${TSC_COUNT}건:\n${TSC_RESULT}\n"
-      ERROR_COUNT=$((ERROR_COUNT + TSC_COUNT))
-    fi
-  fi
-fi
-
-# Python
-if command -v python3 &>/dev/null; then
+  # 코드 패턴 검사
   for f in $CHANGED_FILES; do
-    if [[ "$f" == *.py ]]; then
-      TARGET="$f"
-      [ ! -f "$TARGET" ] && TARGET="$CWD/$f"
-      if [ -f "$TARGET" ]; then
-        PY_RESULT=$(python3 -m py_compile "$TARGET" 2>&1)
-        if [ $? -ne 0 ]; then
-          ERRORS="${ERRORS}\n[Python] ${f}:\n${PY_RESULT}\n"
-          ERROR_COUNT=$((ERROR_COUNT + 1))
-        fi
+    local TARGET="$f"
+    [ ! -f "$TARGET" ] && TARGET="$CWD/$f"
+    if [ -f "$TARGET" ]; then
+      local PATTERNS=$(detect_code_patterns "$TARGET")
+      if [ -n "$PATTERNS" ]; then
+        local LOCATION=$(detect_location "$f")
+        local FOCUS=$(location_to_focus "$LOCATION")
+        PATTERN_WARNINGS="${PATTERN_WARNINGS}\n📄 ${f} (${LOCATION}):\n${PATTERNS}   중점: ${FOCUS}\n"
+        PATTERN_COUNT=$((PATTERN_COUNT + 1))
       fi
     fi
   done
-fi
+}
 
-# ── B. 코드 패턴 검사 (신규: 매칭 조건 4) ──
-for f in $CHANGED_FILES; do
-  TARGET="$f"
-  [ ! -f "$TARGET" ] && TARGET="$CWD/$f"
+_print_results() {
+  local TOTAL_ISSUES=$((ERROR_COUNT + PATTERN_COUNT))
 
-  if [ -f "$TARGET" ]; then
-    # 4. 파일 내용 패턴 감지
-    PATTERNS=$(detect_code_patterns "$TARGET")
-    if [ -n "$PATTERNS" ]; then
-      # 3. 작업 위치 감지
-      LOCATION=$(detect_location "$f")
-      FOCUS=$(location_to_focus "$LOCATION")
-      PATTERN_WARNINGS="${PATTERN_WARNINGS}\n📄 ${f} (${LOCATION}):\n${PATTERNS}   중점: ${FOCUS}\n"
-      PATTERN_COUNT=$((PATTERN_COUNT + 1))
-    fi
-  fi
-done
-
-# ── 결과 종합 출력 ──
-TOTAL_ISSUES=$((ERROR_COUNT + PATTERN_COUNT))
-
-if [ $TOTAL_ISSUES -eq 0 ]; then
-  cat <<'PASS'
+  if [ $TOTAL_ISSUES -eq 0 ]; then
+    cat <<'PASS'
 ───────────────────────────────────────────
 ✅ [완료 후 검사] 모든 검사 통과
 ───────────────────────────────────────────
@@ -172,37 +136,35 @@ if [ $TOTAL_ISSUES -eq 0 ]; then
 □ 에러 처리는 빠짐없이 추가했는가?
 □ 보안상 위험한 부분은 없는가?
 □ 엣지 케이스를 놓치지 않았는가?
+□ 요청 범위를 벗어난 변경은 없는가?
+□ 더 단순하게 할 수 있는가?
 ───────────────────────────────────────────
 PASS
 
-elif [ $TOTAL_ISSUES -le 3 ]; then
-  cat <<MSG
+  elif [ $TOTAL_ISSUES -le 3 ]; then
+    cat <<MSG
 ───────────────────────────────────────────
 ⚠️ [완료 후 검사] 이슈 ${TOTAL_ISSUES}건 — 즉시 수정
 ───────────────────────────────────────────
 MSG
-
-  [ $ERROR_COUNT -gt 0 ] && echo -e "\n🔴 린트/타입 오류 ${ERROR_COUNT}건:${ERRORS}"
-  [ $PATTERN_COUNT -gt 0 ] && echo -e "\n🟡 코드 패턴 경고 ${PATTERN_COUNT}건:${PATTERN_WARNINGS}"
-
-  cat <<'MSG'
+    [ $ERROR_COUNT -gt 0 ] && echo -e "\n🔴 린트/타입 오류 ${ERROR_COUNT}건:${ERRORS}"
+    [ $PATTERN_COUNT -gt 0 ] && echo -e "\n🟡 코드 패턴 경고 ${PATTERN_COUNT}건:${PATTERN_WARNINGS}"
+    cat <<'MSG'
 
 오류가 적으므로 직접 수정하세요.
 수정 후 다시 검사가 실행됩니다.
 ───────────────────────────────────────────
 MSG
 
-else
-  cat <<MSG
+  else
+    cat <<MSG
 ───────────────────────────────────────────
 🚨 [완료 후 검사] 이슈 ${TOTAL_ISSUES}건 — 전문 에이전트 권장
 ───────────────────────────────────────────
 MSG
-
-  [ $ERROR_COUNT -gt 0 ] && echo -e "\n🔴 린트/타입 오류 ${ERROR_COUNT}건:${ERRORS}"
-  [ $PATTERN_COUNT -gt 0 ] && echo -e "\n🟡 코드 패턴 경고 ${PATTERN_COUNT}건:${PATTERN_WARNINGS}"
-
-  cat <<'MSG'
+    [ $ERROR_COUNT -gt 0 ] && echo -e "\n🔴 린트/타입 오류 ${ERROR_COUNT}건:${ERRORS}"
+    [ $PATTERN_COUNT -gt 0 ] && echo -e "\n🟡 코드 패턴 경고 ${PATTERN_COUNT}건:${PATTERN_WARNINGS}"
+    cat <<'MSG'
 
 오류가 많습니다. 전문 서브에이전트 호출을 권장합니다:
 
@@ -213,6 +175,24 @@ MSG
 서브에이전트가 자동 위임되어 보고서를 작성합니다.
 ───────────────────────────────────────────
 MSG
-fi
+  fi
+}
+
+# ── main ──
+
+[ ! -f "$LOG_FILE" ] && exit 0
+
+_check_same_turn_violation
+
+CHANGED_FILES=$(tail -20 "$LOG_FILE" | grep -oE '`[^`]+\.[a-z]+`' | tr -d '`' | sort -u)
+[ -z "$CHANGED_FILES" ] && exit 0
+
+ERRORS=""
+ERROR_COUNT=0
+PATTERN_WARNINGS=""
+PATTERN_COUNT=0
+
+_run_lint_checks
+_print_results
 
 exit 0

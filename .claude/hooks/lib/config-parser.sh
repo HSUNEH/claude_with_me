@@ -33,127 +33,97 @@ _find_config() {
   return 1
 }
 
+# 범용 값 읽기 (내부 함수)
+# 1-depth: _cfg_read_value "section" "key"
+# 2-depth: _cfg_read_value "section" "target" "field"
+_cfg_read_value() {
+  local CONFIG_FILE=$(_find_config)
+  [ -z "$CONFIG_FILE" ] && return 1
+
+  if [ $# -eq 2 ]; then
+    local SECTION="$1" KEY="$2"
+    awk -v section="$SECTION" -v key="$KEY" '
+      BEGIN { in_section=0 }
+      /^[a-z_]+:/ {
+        if ($1 == section":") { in_section=1; next }
+        else if (in_section) { in_section=0 }
+      }
+      in_section && /^  [a-z_]+:/ {
+        sub(/^  /, "")
+        split($0, kv, ": ")
+        k = kv[1]; gsub(/:$/, "", k)
+        if (k == key) {
+          v = $0; sub(/^[^:]+: */, "", v)
+          gsub(/^["'"'"']|["'"'"']$/, "", v)
+          print v; exit
+        }
+      }
+    ' "$CONFIG_FILE"
+  elif [ $# -eq 3 ]; then
+    local SECTION="$1" TARGET="$2" FIELD="$3"
+    awk -v section="$SECTION" -v target="$TARGET" -v field="$FIELD" '
+      BEGIN { in_section=0; in_target=0 }
+      /^[a-z_]+:/ {
+        if ($1 == section":") { in_section=1; next }
+        else if (in_section) { in_section=0; in_target=0 }
+      }
+      in_section && /^  [a-z_]+:/ {
+        sub(/^  /, "")
+        k = $0; gsub(/:.*/, "", k)
+        in_target = (k == target) ? 1 : 0
+        next
+      }
+      in_target && /^    [a-z_]+:/ {
+        sub(/^    /, "")
+        split($0, kv, ": ")
+        k = kv[1]; gsub(/:$/, "", k)
+        if (k == field) {
+          v = $0; sub(/^[^:]+: */, "", v)
+          gsub(/^["'"'"']|["'"'"']$/, "", v)
+          print v; exit
+        }
+      }
+    ' "$CONFIG_FILE"
+  fi
+}
+
 # 단순 값 읽기: cfg_get "section.key"
 # 예: cfg_get "general.change_log_path" → "docs/logs/change-log.md"
 cfg_get() {
   local KEY_PATH="$1"
-  local CONFIG_FILE=$(_find_config)
-  [ -z "$CONFIG_FILE" ] && return 1
-
-  local SECTION=$(echo "$KEY_PATH" | cut -d'.' -f1)
-  local KEY=$(echo "$KEY_PATH" | cut -d'.' -f2-)
-
-  # 섹션 내에서 키 찾기
-  awk -v section="$SECTION" -v key="$KEY" '
-    BEGIN { in_section=0; found=0 }
-    /^[a-z_]+:/ {
-      if ($1 == section":") { in_section=1; next }
-      else if (in_section) { in_section=0 }
-    }
-    in_section && /^  [a-z_]+:/ {
-      sub(/^  /, "")
-      split($0, kv, ": ")
-      k = kv[1]
-      gsub(/:$/, "", k)
-      if (k == key) {
-        v = $0
-        sub(/^[^:]+: */, "", v)
-        gsub(/^["'"'"']|["'"'"']$/, "", v)
-        print v
-        found=1
-        exit
-      }
-    }
-    END { if (!found) exit 1 }
-  ' "$CONFIG_FILE"
+  local SECTION="${KEY_PATH%%.*}"
+  local KEY="${KEY_PATH#*.}"
+  _cfg_read_value "$SECTION" "$KEY"
 }
 
 # 키워드 패턴 읽기: cfg_get_keywords "dev"
 cfg_get_keywords() {
-  local CATEGORY="$1"
-  local CONFIG_FILE=$(_find_config)
-  [ -z "$CONFIG_FILE" ] && return 1
-
-  awk -v cat="$CATEGORY" '
-    BEGIN { in_keywords=0 }
-    /^keywords:/ { in_keywords=1; next }
-    /^[a-z]/ && !/^keywords:/ { if (in_keywords) in_keywords=0 }
-    in_keywords {
-      sub(/^  /, "")
-      split($0, kv, ": ")
-      k = kv[1]
-      gsub(/:$/, "", k)
-      if (k == cat) {
-        v = $0
-        sub(/^[^:]+: */, "", v)
-        gsub(/^["'"'"']|["'"'"']$/, "", v)
-        print v
-        exit
-      }
-    }
-  ' "$CONFIG_FILE"
+  _cfg_read_value "keywords" "$1"
 }
 
 # 의도 패턴/라벨/챕터 읽기: cfg_get_intent_field "bugfix" "patterns"
 cfg_get_intent_field() {
-  local INTENT="$1"
-  local FIELD="$2"
-  local CONFIG_FILE=$(_find_config)
-  [ -z "$CONFIG_FILE" ] && return 1
-
-  awk -v intent="$INTENT" -v field="$FIELD" '
-    BEGIN { in_intents=0; in_target=0 }
-    /^intents:/ { in_intents=1; next }
-    /^[a-z]/ && !/^intents:/ { if (in_intents) { in_intents=0; in_target=0 } }
-    in_intents && /^  [a-z_]+:/ {
-      sub(/^  /, "")
-      k = $0; gsub(/:.*/, "", k)
-      in_target = (k == intent) ? 1 : 0
-      next
-    }
-    in_target && /^    [a-z_]+:/ {
-      sub(/^    /, "")
-      split($0, kv, ": ")
-      k = kv[1]; gsub(/:$/, "", k)
-      if (k == field) {
-        v = $0; sub(/^[^:]+: */, "", v)
-        gsub(/^["'"'"']|["'"'"']$/, "", v)
-        print v
-        exit
-      }
-    }
-  ' "$CONFIG_FILE"
+  _cfg_read_value "intents" "$1" "$2"
 }
 
 # 위치 설정 읽기: cfg_get_location_field "api" "focus"
 cfg_get_location_field() {
-  local LOC="$1"
-  local FIELD="$2"
-  local CONFIG_FILE=$(_find_config)
-  [ -z "$CONFIG_FILE" ] && return 1
+  _cfg_read_value "locations" "$1" "$2"
+}
 
-  awk -v loc="$LOC" -v field="$FIELD" '
-    BEGIN { in_locations=0; in_target=0 }
-    /^locations:/ { in_locations=1; next }
-    /^[a-z]/ && !/^locations:/ { if (in_locations) { in_locations=0; in_target=0 } }
-    in_locations && /^  [a-z_]+:/ {
-      sub(/^  /, "")
-      k = $0; gsub(/:.*/, "", k)
-      in_target = (k == loc) ? 1 : 0
-      next
-    }
-    in_target && /^    [a-z_]+:/ {
-      sub(/^    /, "")
-      split($0, kv, ": ")
-      k = kv[1]; gsub(/:$/, "", k)
-      if (k == field) {
-        v = $0; sub(/^[^:]+: */, "", v)
-        gsub(/^["'"'"']|["'"'"']$/, "", v)
-        print v
-        exit
-      }
-    }
-  ' "$CONFIG_FILE"
+# 코드 패턴 읽기: cfg_get_code_pattern "security_dangerous_functions" "pattern"
+cfg_get_code_pattern() {
+  _cfg_read_value "code_patterns" "$1" "$2"
+}
+
+# general 섹션 값 읽기: cfg_get_general "require_plan" → "true"
+cfg_get_general() {
+  _cfg_read_value "general" "$1"
+}
+
+# 완료 검사 임계값 읽기
+cfg_get_threshold() {
+  _cfg_read_value "completion_check" "$1"
 }
 
 # 체크리스트 읽기: cfg_get_checklist "api" → 줄바꿈 구분 목록
@@ -178,33 +148,6 @@ cfg_get_checklist() {
       print v
     }
     in_target && in_checklist && !/^      - / && !/^$/ { in_checklist=0 }
-  ' "$CONFIG_FILE"
-}
-
-# 코드 패턴 읽기: cfg_get_code_pattern "security_dangerous_functions" "pattern"
-cfg_get_code_pattern() {
-  local NAME="$1"
-  local FIELD="$2"
-  local CONFIG_FILE=$(_find_config)
-  [ -z "$CONFIG_FILE" ] && return 1
-
-  awk -v name="$NAME" -v field="$FIELD" '
-    BEGIN { in_cp=0; in_target=0 }
-    /^code_patterns:/ { in_cp=1; next }
-    /^[a-z]/ && !/^code_patterns:/ { if (in_cp) { in_cp=0; in_target=0 } }
-    in_cp && /^  [a-z_]+:/ {
-      sub(/^  /, ""); k=$0; gsub(/:.*/, "", k)
-      in_target = (k == name) ? 1 : 0; next
-    }
-    in_target && /^    [a-z_]+:/ {
-      sub(/^    /, "")
-      split($0, kv, ": "); k=kv[1]; gsub(/:$/, "", k)
-      if (k == field) {
-        v=$0; sub(/^[^:]+: */, "", v)
-        gsub(/^["'"'"']|["'"'"']$/, "", v)
-        print v; exit
-      }
-    }
   ' "$CONFIG_FILE"
 }
 
@@ -236,42 +179,6 @@ cfg_list_locations() {
     in_locations && /^  [a-z_]+:/ {
       sub(/^  /, ""); gsub(/:.*/, "")
       printf "%s ", $0
-    }
-  ' "$CONFIG_FILE"
-}
-
-# general 섹션 값 읽기: cfg_get_general "require_plan" → "true"
-cfg_get_general() {
-  local KEY="$1"
-  local CONFIG_FILE=$(_find_config)
-  [ -z "$CONFIG_FILE" ] && return 1
-
-  awk -v key="$KEY" '
-    BEGIN { in_general=0 }
-    /^general:/ { in_general=1; next }
-    /^[a-z]/ && !/^general:/ { if (in_general) in_general=0 }
-    in_general && /^  [a-z_]+:/ {
-      sub(/^  /, "")
-      split($0, kv, ": "); k=kv[1]; gsub(/:$/, "", k)
-      if (k == key) { v=$0; sub(/^[^:]+: */, "", v); gsub(/^["'"'"']|["'"'"']$/, "", v); print v; exit }
-    }
-  ' "$CONFIG_FILE"
-}
-
-# 완료 검사 임계값 읽기
-cfg_get_threshold() {
-  local KEY="$1"
-  local CONFIG_FILE=$(_find_config)
-  [ -z "$CONFIG_FILE" ] && return 1
-
-  awk -v key="$KEY" '
-    BEGIN { in_cc=0 }
-    /^completion_check:/ { in_cc=1; next }
-    /^[a-z]/ && !/^completion_check:/ { if (in_cc) in_cc=0 }
-    in_cc && /^  [a-z_]+:/ {
-      sub(/^  /, "")
-      split($0, kv, ": "); k=kv[1]; gsub(/:$/, "", k)
-      if (k == key) { v=$0; sub(/^[^:]+: */, "", v); print v; exit }
     }
   ' "$CONFIG_FILE"
 }
