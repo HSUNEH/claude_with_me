@@ -475,7 +475,18 @@ model: sonnet
 2. {추가 규칙}
 ```
 
-### 5-F: 초기화 완료 마커 & 계획 활성화
+### 5-F: 템플릿 디렉토리 정리 & 초기화 완료
+
+setup에 사용된 템플릿 저장소 디렉토리를 삭제한다 (`.claude/`, `docs/` 등이 이미 복사되었으므로 불필요):
+
+```bash
+# 템플릿 디렉토리 감지 및 삭제 (dev_sys_template 또는 dev-system-template)
+for DIR in dev_sys_template dev-system-template; do
+  [ -d "$DIR" ] && rm -rf "$DIR"
+done
+```
+
+초기화 완료 마커 생성:
 
 ```bash
 touch .claude/.initialized
