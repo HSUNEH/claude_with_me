@@ -8,5 +8,5 @@ Type "bash ../mocks/demo-plan-resume.sh"
 Enter
 Sleep 1.5s
 Show
-Sleep 11s
+Sleep 6.5s
 Sleep 0.5s

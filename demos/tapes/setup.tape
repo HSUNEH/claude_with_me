@@ -8,5 +8,5 @@ Type "bash ../mocks/demo-setup.sh"
 Enter
 Sleep 1.5s
 Show
-Sleep 34s
+Sleep 23s
 Sleep 0.5s
