@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# demo-plan-resume.sh — 계획 승인 → /clear → 재개 시뮬레이션
+# demo-plan-resume.sh — 계획 승인 → /clear → "이어서 구현해줘" → 구현 시작 시뮬레이션
 set -euo pipefail
 
 BOLD='\033[1m'
@@ -17,6 +17,13 @@ type_fast() {
         printf "%s" "${text:$i:1}"
         sleep 0.03
     done
+}
+
+type_user() {
+    printf "\n${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
+    type_fast "$1"
+    printf "${RESET}\n"
+    sleep 0.3
 }
 
 clear
@@ -39,22 +46,20 @@ ${BOLD}✅ 계획이 승인되었습니다${RESET}
 
 📂 CHECKLIST.md → 🟡 진행 중
 
-👉 /clear 후 "이어서 구현해줘" 라고 입력하세요.
+💡 /clear 로 컨텍스트를 정리한 뒤 작업을 시작하세요.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 MSG
 sleep 0.8
 
-# ── /clear 효과 ──
-printf "\n${GRAY}── /clear 실행 → 새 컨텍스트 ──${RESET}\n"
-sleep 0.5
-echo ""
+# ── /clear 실행 ──
+type_user "/clear"
+sleep 0.3
 
-# ── 새 프롬프트 ──
-printf "${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
-type_fast "이어서 구현해줘"
-printf "${RESET}"
-sleep 0.2
-echo ""
+printf "${GRAY}── 컨텍스트 초기화 완료 ──${RESET}\n"
+sleep 0.4
+
+# ── 새 세션: 이어서 구현해줘 ──
+type_user "이어서 구현해줘"
 sleep 0.3
 
 # ── plan-guard Hook: 진행 중 감지 ──
@@ -80,7 +85,7 @@ MSG
 printf "${RESET}"
 sleep 0.5
 
-# ── Claude 응답 ──
+# ── Claude: 계획 읽고 구현 시작 ──
 echo ""
 printf "${BOLD}${WHITE}"
 cat <<'MSG'

@@ -9,4 +9,4 @@ Enter
 Sleep 1.5s
 Show
 Sleep 10s
-Sleep 1.5s
+Sleep 0.5s

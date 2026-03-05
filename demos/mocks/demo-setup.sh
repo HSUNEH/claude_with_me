@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# demo-setup.sh — /setup 위저드 5단계 압축 시뮬레이션
+# demo-setup.sh — /setup 위저드 5단계 시뮬레이션 (Phase별 사용자 응답 포함)
 set -euo pipefail
 
 BOLD='\033[1m'
@@ -19,8 +19,15 @@ type_fast() {
     done
 }
 
+type_user() {
+    local text="$1"
+    printf "\n${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
+    type_fast "$text"
+    printf "${RESET}\n"
+    sleep 0.3
+}
+
 clear
-echo ""
 printf "${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
 type_fast "/setup"
 printf "${RESET}"
@@ -43,49 +50,73 @@ printf "  ${DIM}Phase 4  초기 개발 계획${RESET}\n"
 printf "  ${DIM}Phase 5  환경 세팅 적용${RESET}\n\n"
 sleep 0.8
 
-# ── Phase 1 ──
+# ── Phase 1: 질문 ──
 printf "${BOLD}📋 Phase 1: 프로젝트에 대해 알려주세요${RESET}\n\n"
 sleep 0.2
+printf "  1. 프로젝트 이름은?\n"
+printf "  2. 한 문장으로 설명하면?\n"
+printf "  3. 핵심 기능 3~5개\n"
+printf "  4. 첫 번째로 만들고 싶은 기능은?\n"
+sleep 0.6
 
+# ── Phase 1: 사용자 응답 ──
+type_user "todo-app / 팀 협업용 할 일 관리 웹앱 / 사용자 인증, 할 일 CRUD, 실시간 동기화 / 사용자 인증"
+sleep 0.3
+
+# ── Phase 1: 확인 ──
+printf "\n📌 프로젝트 비전 확인:\n\n"
 printf "  ${CYAN}→${RESET} 이름: todo-app\n"
-sleep 0.08
 printf "  ${CYAN}→${RESET} 설명: 팀 협업용 할 일 관리 웹앱\n"
-sleep 0.08
 printf "  ${CYAN}→${RESET} 핵심 기능: 사용자 인증, 할 일 CRUD, 실시간 동기화\n"
-sleep 0.08
-printf "  ${CYAN}→${RESET} 첫 기능: 사용자 인증\n"
+printf "  ${CYAN}→${RESET} 첫 작업: 사용자 인증\n\n"
+printf "이대로 진행할까요?\n"
 sleep 0.5
 
-echo ""
-echo "📌 프로젝트 비전 확인 ✓"
-sleep 0.4
+# ── Phase 1: 사용자 승인 ──
+type_user "확인"
+sleep 0.3
 
-# ── Phase 2 ──
+# ── Phase 2: 질문 + 응답 ──
 printf "\n${BOLD}📋 Phase 2: 기술 환경${RESET}\n\n"
-sleep 0.2
+printf "  언어, 프레임워크, DB, 패키지 매니저, 테스트, 린터를 알려주세요.\n"
+sleep 0.5
+
+type_user "TypeScript + Next.js (App Router) / PostgreSQL + Prisma / pnpm / Vitest / ESLint + Prettier"
+sleep 0.3
+
+printf "\n📌 기술 환경 확인:\n\n"
 printf "  ${CYAN}→${RESET} TypeScript + Next.js (App Router)\n"
-sleep 0.06
 printf "  ${CYAN}→${RESET} PostgreSQL + Prisma\n"
-sleep 0.06
-printf "  ${CYAN}→${RESET} pnpm / Vitest / ESLint + Prettier\n"
-sleep 0.4
+printf "  ${CYAN}→${RESET} pnpm / Vitest / ESLint + Prettier\n\n"
+printf "이대로 진행할까요?\n"
+sleep 0.5
 
-echo ""
-echo "📌 기술 환경 확인 ✓"
-sleep 0.4
+type_user "확인"
+sleep 0.3
 
-# ── Phase 3 ──
+# ── Phase 3: 질문 + 응답 ──
 printf "\n${BOLD}📋 Phase 3: 워크플로우${RESET}\n\n"
-sleep 0.2
-printf "  ${CYAN}→${RESET} camelCase / 커스텀 에러 클래스 / JWT / GitHub Flow\n"
-sleep 0.4
+printf "  코딩 규칙, 에러 처리, 보안, Git 전략을 알려주세요.\n"
+printf "  (특별한 규칙이 없으면 \"기본\")\n"
+sleep 0.5
 
-echo ""
-echo "📌 워크플로우 확인 ✓"
-sleep 0.4
+type_user "camelCase / 커스텀 에러 클래스 / JWT / GitHub Flow / 나머지 기본"
+sleep 0.3
 
-# ── Phase 4 ──
-printf "\n${BOLD}📋 Phase 4: 초기 개발 계획${RESET}\n"
+printf "\n📌 워크플로우 확인:\n\n"
+printf "  ${CYAN}→${RESET} 네이밍: camelCase\n"
+printf "  ${CYAN}→${RESET} 에러: 커스텀 에러 클래스\n"
+printf "  ${CYAN}→${RESET} 인증: JWT\n"
+printf "  ${CYAN}→${RESET} 브랜치: GitHub Flow\n\n"
+printf "이대로 진행할까요?\n"
+sleep 0.5
+
+type_user "확인"
+sleep 0.3
+
+# ── Phase 4: 계획 생성 ──
+printf "\n${BOLD}📋 Phase 4: 초기 개발 계획${RESET}\n\n"
+printf "첫 번째 기능 \"사용자 인증\"의 개발 계획을 수립했습니다.\n"
 cat <<'MSG'
 
 📂 docs/plans/user-auth/
@@ -94,10 +125,15 @@ cat <<'MSG'
   └── CHECKLIST.md  ← 작업 체크리스트
 
 MSG
+printf "계획을 검토해주세요.\n"
 sleep 0.5
+
+type_user "확인"
+sleep 0.3
 
 # ── Phase 5 완료 ──
 cat <<MSG
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${BOLD}✅ 프로젝트 초기화 완료!${RESET}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

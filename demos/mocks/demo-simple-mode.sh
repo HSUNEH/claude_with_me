@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# demo-simple-mode.sh — 간단한 작업 시뮬레이션
+# demo-simple-mode.sh — 간단한 작업 시뮬레이션 (확인 → 사용자 승인 → 수정)
 set -euo pipefail
 
 BOLD='\033[1m'
@@ -19,6 +19,13 @@ type_fast() {
     done
 }
 
+type_user() {
+    printf "\n${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
+    type_fast "$1"
+    printf "${RESET}\n"
+    sleep 0.3
+}
+
 clear
 echo ""
 
@@ -30,13 +37,18 @@ sleep 0.2
 echo ""
 sleep 0.3
 
-# ── Claude 응답: 간단 작업 확인 ──
+# ── Claude: 간단 작업 확인 질문 ──
 echo ""
-printf "${BOLD}${WHITE}간단한 수정입니다. 바로 진행하겠습니다.${RESET}\n"
-sleep 0.4
+printf "${BOLD}${WHITE}간단한 수정으로 보입니다.${RESET}\n"
+printf "${BOLD}${WHITE}바로 진행할까요, 아니면 /plan-manager로 계획을 수립할까요?${RESET}\n"
+sleep 0.5
 
-echo ""
-printf "${GRAY}  📝 src/components/Header.tsx 수정 중...${RESET}\n"
+# ── 사용자: 바로 해줘 ──
+type_user "바로 해줘"
+sleep 0.3
+
+# ── Claude: 수정 진행 ──
+printf "\n${GRAY}  📝 src/components/Header.tsx 수정 중...${RESET}\n"
 sleep 0.3
 
 # ── 코드 변경 ──

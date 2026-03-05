@@ -26,4 +26,4 @@ Enter
 Sleep 1.5s
 Show
 Sleep 8s
-Sleep 1.5s
+Sleep 0.5s
