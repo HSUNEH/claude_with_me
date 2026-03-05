@@ -27,8 +27,7 @@ rsync -av --delete "$TEMPLATE_DIR/docs/" "$PARENT_DIR/docs/" \
 # 실행 권한 설정
 chmod +x "$PARENT_DIR/.claude/hooks/"*.sh "$PARENT_DIR/.claude/hooks/lib/"*.sh
 
-# .initialized 마커 유지
-touch "$PARENT_DIR/.claude/.initialized"
+# .initialized 마커: 이미 존재하면 보존 (sync가 새로 생성하지 않음)
 
 echo ""
 echo "동기화 완료"
