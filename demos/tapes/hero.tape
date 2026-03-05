@@ -1,40 +1,29 @@
-# hero.tape — 전체 워크플로우 히어로 GIF
-# 핵심 기능 3가지를 연속 시연: 계획 강제 → 매뉴얼 추천 → 품질 검사
-# Output: demos/assets/hero.gif
-
+# hero.tape — 4개 시나리오 핵심 장면 조합
 Source "common.tape"
 Set Height 700
-
 Output "../assets/hero.gif"
 
-# ── Scene 1: 계획 강제 ──
+# Scene 1: 계획 모드
 Hide
-Type "bash ../mocks/demo-plan-guard.sh"
+Type "bash ../mocks/demo-plan-mode.sh"
 Enter
-Sleep 2s
+Sleep 1.5s
 Show
+Sleep 10s
 
-Sleep 12s
-Sleep 2s
-
-# ── Scene 2: 매뉴얼 추천 ──
+# Scene 2: 승인 → 재개
 Hide
-Type "bash ../mocks/demo-auto-manual.sh"
+Type "bash ../mocks/demo-plan-resume.sh"
 Enter
-Sleep 2s
+Sleep 1.5s
 Show
+Sleep 11s
 
-Sleep 12s
-Sleep 2s
-
-# ── Scene 3: 품질 검사 ──
+# Scene 3: 간단 모드
 Hide
-Type "bash ../mocks/demo-quality-check.sh"
+Type "bash ../mocks/demo-simple-mode.sh"
 Enter
-Sleep 2s
+Sleep 1.5s
 Show
-
-Sleep 15s
-
-# 마무리
-Sleep 3s
+Sleep 8s
+Sleep 1.5s
