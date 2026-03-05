@@ -19,3 +19,12 @@
 | 2026-02-26 14:01:24 | Write | `/Users/hwangseontae/dev-sys/dev-system-template/.claude/skills/dev-manual/chapters/06-testing.md` | 파일 생성/덮어쓰기 |
 | 2026-02-26 14:01:54 | Write | `/Users/hwangseontae/dev-sys/dev-system-template/CLAUDE.md` | 파일 생성/덮어쓰기 |
 | 2026-02-26 14:02:05 | Bash | — | `rm -rf /Users/hwangseontae/dev-sys/docs/plans/dev-loop-stabilization /Users/hwan` |
+| 2026-03-05 13:11:15 | Edit | `/Users/hwangseontae/dev-sys/dev-system-template/demos/mocks/demo-setup.sh` | `sleep 1.0...` → 수정 |
+| 2026-03-05 13:11:16 | Edit | `/Users/hwangseontae/dev-sys/dev-system-template/demos/mocks/demo-plan-resume.sh` | `sleep 1.0...` → 수정 |
+| 2026-03-05 13:11:16 | Edit | `/Users/hwangseontae/dev-sys/dev-system-template/demos/mocks/demo-simple-mode.sh` | `sleep 1.0...` → 수정 |
+| 2026-03-05 13:28:28 | Edit | `/Users/hwangseontae/dev-sys/dev-system-template/demos/tapes/setup.tape` | `Sleep 34s...` → 수정 |
+| 2026-03-05 13:28:56 | Edit | `/Users/hwangseontae/dev-sys/dev-system-template/demos/tapes/plan-mode.tape` | `Sleep 10s...` → 수정 |
+| 2026-03-05 13:28:57 | Edit | `/Users/hwangseontae/dev-sys/dev-system-template/demos/tapes/plan-resume.tape` | `Sleep 11s...` → 수정 |
+| 2026-03-05 13:28:57 | Edit | `/Users/hwangseontae/dev-sys/dev-system-template/demos/tapes/simple-mode.tape` | `Sleep 8s...` → 수정 |
+| 2026-03-05 13:40:32 | Edit | `/Users/hwangseontae/dev-sys/docs/plans/merge-demo-2-3/CHECKLIST.md` | `## 진행 상태: 🟡 진행 중...` → 수정 |
+| 2026-03-05 13:40:35 | Edit | `/Users/hwangseontae/dev-sys/docs/plans/merge-demo-2-3/CHECKLIST.md` | `  - [ ] git commit & push...` → 수정 |
