@@ -10,6 +10,7 @@ YELLOW='\033[33m'
 WHITE='\033[97m'
 GRAY='\033[90m'
 RESET='\033[0m'
+LINE="${DIM}──────────────────────────────────────────────${RESET}"
 
 type_fast() {
     local text="$1"
@@ -19,25 +20,30 @@ type_fast() {
     done
 }
 
-type_user() {
+prompt_user() {
     local text="$1"
-    printf "\n${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
+    printf "\n${LINE}\n"
+    printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
     type_fast "$text"
     printf "${RESET}\n"
+    printf "${LINE}\n"
     sleep 0.3
 }
 
 clear
-printf "${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
+
+# ── 사용자: /setup 입력 ──
+printf "${LINE}\n"
+printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
 type_fast "/setup"
-printf "${RESET}"
+printf "${RESET}\n"
+printf "${LINE}\n"
 sleep 0.3
 echo ""
 sleep 0.4
 
 # ── 시작 배너 ──
 cat <<'MSG'
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🚀 프로젝트 초기화 위저드를 시작합니다
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -60,7 +66,7 @@ printf "  4. 첫 번째로 만들고 싶은 기능은?\n"
 sleep 0.6
 
 # ── Phase 1: 사용자 응답 ──
-type_user "todo-app / 팀 협업용 할 일 관리 웹앱 / 사용자 인증, 할 일 CRUD, 실시간 동기화 / 사용자 인증"
+prompt_user "todo-app / 팀 협업용 할 일 관리 웹앱 / 사용자 인증, 할 일 CRUD, 실시간 동기화 / 사용자 인증"
 sleep 0.3
 
 # ── Phase 1: 확인 ──
@@ -73,7 +79,7 @@ printf "이대로 진행할까요?\n"
 sleep 0.5
 
 # ── Phase 1: 사용자 승인 ──
-type_user "확인"
+prompt_user "확인"
 sleep 0.3
 
 # ── Phase 2: 질문 + 응답 ──
@@ -81,7 +87,7 @@ printf "\n${BOLD}📋 Phase 2: 기술 환경${RESET}\n\n"
 printf "  언어, 프레임워크, DB, 패키지 매니저, 테스트, 린터를 알려주세요.\n"
 sleep 0.5
 
-type_user "TypeScript + Next.js (App Router) / PostgreSQL + Prisma / pnpm / Vitest / ESLint + Prettier"
+prompt_user "TypeScript + Next.js (App Router) / PostgreSQL + Prisma / pnpm / Vitest / ESLint + Prettier"
 sleep 0.3
 
 printf "\n📌 기술 환경 확인:\n\n"
@@ -91,7 +97,7 @@ printf "  ${CYAN}→${RESET} pnpm / Vitest / ESLint + Prettier\n\n"
 printf "이대로 진행할까요?\n"
 sleep 0.5
 
-type_user "확인"
+prompt_user "확인"
 sleep 0.3
 
 # ── Phase 3: 질문 + 응답 ──
@@ -100,7 +106,7 @@ printf "  코딩 규칙, 에러 처리, 보안, Git 전략을 알려주세요.\n
 printf "  (특별한 규칙이 없으면 \"기본\")\n"
 sleep 0.5
 
-type_user "camelCase / 커스텀 에러 클래스 / JWT / GitHub Flow / 나머지 기본"
+prompt_user "camelCase / 커스텀 에러 클래스 / JWT / GitHub Flow / 나머지 기본"
 sleep 0.3
 
 printf "\n📌 워크플로우 확인:\n\n"
@@ -111,7 +117,7 @@ printf "  ${CYAN}→${RESET} 브랜치: GitHub Flow\n\n"
 printf "이대로 진행할까요?\n"
 sleep 0.5
 
-type_user "확인"
+prompt_user "확인"
 sleep 0.3
 
 # ── Phase 4: 계획 생성 ──
@@ -128,7 +134,7 @@ MSG
 printf "계획을 검토해주세요.\n"
 sleep 0.5
 
-type_user "확인"
+prompt_user "확인"
 sleep 0.3
 
 # ── Phase 5 완료 ──

@@ -10,6 +10,7 @@ YELLOW='\033[33m'
 WHITE='\033[97m'
 GRAY='\033[90m'
 RESET='\033[0m'
+LINE="${DIM}──────────────────────────────────────────────${RESET}"
 
 type_fast() {
     local text="$1"
@@ -19,10 +20,13 @@ type_fast() {
     done
 }
 
-type_user() {
-    printf "\n${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
-    type_fast "$1"
+prompt_user() {
+    local text="$1"
+    printf "\n${LINE}\n"
+    printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
+    type_fast "$text"
     printf "${RESET}\n"
+    printf "${LINE}\n"
     sleep 0.3
 }
 
@@ -30,15 +34,16 @@ clear
 echo ""
 
 # ── 사용자: 승인 ──
-printf "${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
+printf "${LINE}\n"
+printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
 type_fast "승인"
-printf "${RESET}"
+printf "${RESET}\n"
+printf "${LINE}\n"
 sleep 0.2
 echo ""
 sleep 0.3
 
 # ── Claude: 승인 처리 ──
-echo ""
 cat <<MSG
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${BOLD}✅ 계획이 승인되었습니다${RESET}
@@ -52,7 +57,7 @@ MSG
 sleep 0.8
 
 # ── 사용자: /clear 입력 ──
-type_user "/clear"
+prompt_user "/clear"
 sleep 0.3
 
 # ── 화면 초기화 (실제 /clear 효과) ──
@@ -62,15 +67,16 @@ printf "${GRAY}── 컨텍스트 초기화 완료 ──${RESET}\n\n"
 sleep 0.5
 
 # ── 새 세션: 사용자가 이어서 구현해줘 입력 ──
-printf "${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
+printf "${LINE}\n"
+printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
 type_fast "이어서 구현해줘"
-printf "${RESET}"
+printf "${RESET}\n"
+printf "${LINE}\n"
 sleep 0.2
 echo ""
 sleep 0.3
 
 # ── plan-guard Hook: 진행 중 감지 ──
-echo ""
 printf "${DIM}"
 cat <<'MSG'
 ───────────────────────────────────────────

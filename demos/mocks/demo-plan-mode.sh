@@ -9,6 +9,7 @@ YELLOW='\033[33m'
 WHITE='\033[97m'
 GRAY='\033[90m'
 RESET='\033[0m'
+LINE="${DIM}──────────────────────────────────────────────${RESET}"
 
 type_fast() {
     local text="$1"
@@ -22,15 +23,16 @@ clear
 echo ""
 
 # ── 사용자 입력 ──
-printf "${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
+printf "${LINE}\n"
+printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
 type_fast "로그인 기능 만들어줘"
-printf "${RESET}"
+printf "${RESET}\n"
+printf "${LINE}\n"
 sleep 0.3
 echo ""
 sleep 0.3
 
 # ── plan-guard Hook ──
-echo ""
 printf "${DIM}"
 cat <<'MSG'
 ───────────────────────────────────────────
@@ -75,4 +77,4 @@ sleep 0.5
 echo ""
 printf "${BOLD}${YELLOW}⏸️ 검토 후 승인해주세요.${RESET}\n"
 printf "   승인 전까지 코드 작성을 시작하지 않습니다.\n"
-sleep 1.0
+sleep 0.3

@@ -10,6 +10,7 @@ YELLOW='\033[33m'
 WHITE='\033[97m'
 GRAY='\033[90m'
 RESET='\033[0m'
+LINE="${DIM}──────────────────────────────────────────────${RESET}"
 
 type_fast() {
     local text="$1"
@@ -19,10 +20,13 @@ type_fast() {
     done
 }
 
-type_user() {
-    printf "\n${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
-    type_fast "$1"
+prompt_user() {
+    local text="$1"
+    printf "\n${LINE}\n"
+    printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
+    type_fast "$text"
     printf "${RESET}\n"
+    printf "${LINE}\n"
     sleep 0.3
 }
 
@@ -30,21 +34,22 @@ clear
 echo ""
 
 # ── 사용자 입력 ──
-printf "${BOLD}${CYAN}❯${RESET} ${BOLD}${WHITE}"
+printf "${LINE}\n"
+printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
 type_fast "헤더 색상 파란색으로 바꿔줘"
-printf "${RESET}"
+printf "${RESET}\n"
+printf "${LINE}\n"
 sleep 0.2
 echo ""
 sleep 0.3
 
 # ── Claude: 간단 작업 확인 질문 ──
-echo ""
 printf "${BOLD}${WHITE}간단한 수정으로 보입니다. 바로 진행할까요,${RESET}\n"
 printf "${BOLD}${WHITE}아니면 /plan-manager로 새 계획을 수립할까요?${RESET}\n"
 sleep 0.5
 
 # ── 사용자: 승인 ──
-type_user "바로 진행해줘"
+prompt_user "바로 진행해줘"
 sleep 0.3
 
 # ── Claude: 수정 진행 ──
