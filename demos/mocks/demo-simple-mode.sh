@@ -23,7 +23,9 @@ type_fast() {
 prompt_user() {
     local text="$1"
     printf "\n${LINE}\n"
-    printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
+    printf "${BOLD}${WHITE}› ${RESET}"
+    sleep 0.4
+    printf "${BOLD}${WHITE}"
     type_fast "$text"
     printf "${RESET}\n"
     printf "${LINE}\n"
@@ -35,7 +37,9 @@ echo ""
 
 # ── 사용자 입력 ──
 printf "${LINE}\n"
-printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
+printf "${BOLD}${WHITE}› ${RESET}"
+sleep 0.4
+printf "${BOLD}${WHITE}"
 type_fast "헤더 색상 파란색으로 바꿔줘"
 printf "${RESET}\n"
 printf "${LINE}\n"

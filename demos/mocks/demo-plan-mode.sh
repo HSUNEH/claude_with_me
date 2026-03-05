@@ -24,7 +24,9 @@ echo ""
 
 # ── 사용자 입력 ──
 printf "${LINE}\n"
-printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
+printf "${BOLD}${WHITE}› ${RESET}"
+sleep 0.4
+printf "${BOLD}${WHITE}"
 type_fast "로그인 기능 만들어줘"
 printf "${RESET}\n"
 printf "${LINE}\n"

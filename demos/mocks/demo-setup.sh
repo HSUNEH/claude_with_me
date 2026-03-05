@@ -22,8 +22,12 @@ type_fast() {
 
 prompt_user() {
     local text="$1"
+    # 빈 프롬프트 창 먼저 표시
     printf "\n${LINE}\n"
-    printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
+    printf "${BOLD}${WHITE}› ${RESET}"
+    sleep 0.4
+    # 사용자가 타이핑
+    printf "${BOLD}${WHITE}"
     type_fast "$text"
     printf "${RESET}\n"
     printf "${LINE}\n"
@@ -34,7 +38,9 @@ clear
 
 # ── 사용자: /setup 입력 ──
 printf "${LINE}\n"
-printf "${BOLD}${WHITE}› ${RESET}${BOLD}${WHITE}"
+printf "${BOLD}${WHITE}› ${RESET}"
+sleep 0.4
+printf "${BOLD}${WHITE}"
 type_fast "/setup"
 printf "${RESET}\n"
 printf "${LINE}\n"
