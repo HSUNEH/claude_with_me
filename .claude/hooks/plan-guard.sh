@@ -34,22 +34,54 @@ _check_init_status() {
 
   # .claude/hooks 존재 + .initialized 없음 = 세팅 미완료
   if [ -d "$CWD/.claude/hooks" ]; then
+    # /setup 명령이면 통과
     if echo "$PROMPT" | grep -qE '^\s*/setup(\s|$)'; then
       exit 0
     fi
-    cat >&2 <<'MSG'
+
+    # 설치 검증: 필수 파일 존재 확인
+    local MISSING=""
+    [ ! -f "$CWD/.claude/settings.json" ] && MISSING="${MISSING}  · .claude/settings.json"$'\n'
+
+    local HOOK_COUNT
+    HOOK_COUNT=$(find "$CWD/.claude/hooks" -maxdepth 1 -name '*.sh' 2>/dev/null | wc -l | tr -d ' ')
+    [ "$HOOK_COUNT" -eq 0 ] && MISSING="${MISSING}  · .claude/hooks/*.sh (Hook 스크립트)"$'\n'
+
+    [ ! -d "$CWD/.claude/skills" ] && MISSING="${MISSING}  · .claude/skills/ (스킬 디렉토리)"$'\n'
+
+    if [ -n "$MISSING" ]; then
+      cat <<MSG
 ───────────────────────────────────────────
-⛔ [세팅 미완료] /setup이 아직 완료되지 않았습니다
+⚠️ [설치 불완전] 일부 파일이 누락되었습니다
 ───────────────────────────────────────────
 
-👉 /setup 을 실행하여 세팅을 완료하세요.
+누락된 항목:
+${MISSING}
+💡 dev_sys_template에서 다시 설치하거나,
+   install.sh를 실행하여 설치를 완료하세요.
 
-💡 GitHub에서 설치한 직후라면:
-   Claude Code를 한번 종료(/exit)한 뒤 다시 시작하세요.
-   재시작해야 /setup 스킬이 인식됩니다.
+[시스템 지시] 설치가 불완전합니다. 사용자에게 위 누락 항목을 안내하고 재설치를 도와주세요.
 ───────────────────────────────────────────
 MSG
-    exit 2
+      exit 0
+    fi
+
+    # 설치 완료이나 /setup 미실행
+    cat <<'MSG'
+───────────────────────────────────────────
+🚀 [세팅 미완료] /setup을 실행해주세요
+───────────────────────────────────────────
+
+파일 설치는 완료되었지만, 프로젝트 초기 설정이 필요합니다.
+
+👉 /setup 을 실행하면 5단계 대화형 위저드로
+   프로젝트 전체 세팅을 완료합니다.
+   (비전 수집 → 환경 분석 → 워크플로우 → 개발 계획 → 환경 세팅)
+
+[시스템 지시] 초기 세팅이 완료되지 않았습니다. 사용자에게 /setup 실행을 안내하세요. 코드 작성이나 다른 작업을 수행하지 마세요.
+───────────────────────────────────────────
+MSG
+    exit 0
   fi
 }
 

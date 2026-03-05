@@ -16,23 +16,6 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/matcher.sh"
 
-# ── 0. 초기 세팅 감지: .initialized 마커 없으면 /setup 안내
-INIT_MARKER="$CWD/.claude/.initialized"
-if [ ! -f "$INIT_MARKER" ] && [ -d "$CWD/.claude/hooks" ]; then
-  cat <<'INIT'
-───────────────────────────────────────────
-🚀 [초기 세팅] 프로젝트 설정이 필요합니다
-───────────────────────────────────────────
-
-먼저 /setup 을 실행하여 프로젝트 초기화 위저드를 시작하세요.
-
-→ 5단계 대화형 위저드로 프로젝트 전체 세팅을 완료합니다.
-  (비전 수집 → 환경 분석 → 워크플로우 → 개발 계획 → 환경 세팅)
-───────────────────────────────────────────
-INIT
-  exit 0
-fi
-
 # ── 1. 키워드 매칭: 개발 관련이 아니면 스킵
 KEYWORD_TYPE=$(match_keywords "$PROMPT")
 if [ "$KEYWORD_TYPE" = "none" ]; then
