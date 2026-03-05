@@ -95,4 +95,4 @@ Phase 1부터 시작합니다.
 📄 prisma/schema.prisma 생성 중...
 MSG
 printf "${RESET}"
-sleep 1.0
+sleep 0.3

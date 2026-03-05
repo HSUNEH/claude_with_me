@@ -72,4 +72,4 @@ sleep 0.4
 
 echo ""
 printf "${BOLD}${WHITE}헤더 색상을 파란색으로 변경했습니다.${RESET}\n"
-sleep 1.0
+sleep 0.3
