@@ -39,12 +39,12 @@ sleep 0.3
 
 # ── Claude: 간단 작업 확인 질문 ──
 echo ""
-printf "${BOLD}${WHITE}간단한 수정으로 보입니다.${RESET}\n"
-printf "${BOLD}${WHITE}바로 진행할까요, 아니면 /plan-manager로 계획을 수립할까요?${RESET}\n"
+printf "${BOLD}${WHITE}간단한 수정으로 보입니다. 바로 진행할까요,${RESET}\n"
+printf "${BOLD}${WHITE}아니면 /plan-manager로 새 계획을 수립할까요?${RESET}\n"
 sleep 0.5
 
-# ── 사용자: 바로 해줘 ──
-type_user "바로 해줘"
+# ── 사용자: 승인 ──
+type_user "바로 진행해줘"
 sleep 0.3
 
 # ── Claude: 수정 진행 ──
