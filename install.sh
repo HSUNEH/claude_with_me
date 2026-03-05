@@ -66,17 +66,27 @@ else
   cp -r "$TEMPLATE_DIR/.claude" "$TARGET_DIR/.claude"
 fi
 
-echo "[복사] docs/ 복사 중..."
+# 3. 기존 파일 백업 (_origin)
 if [ -d "$TARGET_DIR/docs" ]; then
-  # docs/plans, docs/logs, docs/reports는 보존
-  for SUBDIR in plans logs reports; do
-    if [ -d "$TEMPLATE_DIR/docs/$SUBDIR" ] && [ ! -d "$TARGET_DIR/docs/$SUBDIR" ]; then
-      cp -r "$TEMPLATE_DIR/docs/$SUBDIR" "$TARGET_DIR/docs/$SUBDIR"
-    fi
-  done
-else
-  cp -r "$TEMPLATE_DIR/docs" "$TARGET_DIR/docs"
+  if [ ! -d "$TARGET_DIR/docs_origin" ]; then
+    echo "[백업] docs/ → docs_origin/ (기존 원본 보존)"
+    mv "$TARGET_DIR/docs" "$TARGET_DIR/docs_origin"
+  else
+    echo "[유지] docs_origin/ 이미 존재 — 기존 원본 보존"
+  fi
 fi
+
+if [ -f "$TARGET_DIR/CLAUDE.md" ]; then
+  if [ ! -f "$TARGET_DIR/CLAUDE_origin.md" ]; then
+    echo "[백업] CLAUDE.md → CLAUDE_origin.md (기존 원본 보존)"
+    mv "$TARGET_DIR/CLAUDE.md" "$TARGET_DIR/CLAUDE_origin.md"
+  else
+    echo "[유지] CLAUDE_origin.md 이미 존재 — 기존 원본 보존"
+  fi
+fi
+
+echo "[복사] docs/ 복사 중..."
+cp -r "$TEMPLATE_DIR/docs" "$TARGET_DIR/docs"
 
 echo "[복사] CLAUDE.md 복사 중..."
 cp "$TEMPLATE_DIR/CLAUDE.md" "$TARGET_DIR/CLAUDE.md"

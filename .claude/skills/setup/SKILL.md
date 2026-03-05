@@ -114,8 +114,18 @@ Phase 1에서 "기존 프로젝트"라고 답한 경우, **질문 전에 먼저 
 ├── 기존 테스트 파일 → 테스트 프레임워크
 ├── .env / .env.example → 환경변수 패턴
 ├── Dockerfile / docker-compose → 배포 환경
-└── 기존 코드 샘플 → 네이밍, import 순서 추론
+├── 기존 코드 샘플 → 네이밍, import 순서 추론
+├── CLAUDE_origin.md → 기존 프로젝트 설명/규칙 (install 시 백업된 원본)
+└── docs_origin/ → 기존 문서/계획 (install 시 백업된 원본)
 ```
+
+#### _origin 파일 활용
+
+install.sh가 기존 `CLAUDE.md`와 `docs/`를 `CLAUDE_origin.md`, `docs_origin/`으로 백업한다.
+이 파일들이 존재하면 **반드시 읽고 분석에 반영**한다:
+
+- **`CLAUDE_origin.md`**: 기존 프로젝트의 설명, 코딩 규칙, 아키텍처 정보를 추출하여 Phase 2 분석 결과와 Phase 5의 CLAUDE.md 생성에 반영한다.
+- **`docs_origin/`**: 기존 문서 구조, 계획, 가이드를 파악하여 프로젝트 맥락을 이해한다.
 
 분석 결과를 정리하여 사용자에게 보여준다:
 
