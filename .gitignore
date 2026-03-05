@@ -1,6 +1,3 @@
 .DS_Store
 .claude/.initialized
 .claude/.setup-in-progress
-
-# 데모 GIF (용량이 크므로 git 추적 제외)
-demos/assets/*.gif
