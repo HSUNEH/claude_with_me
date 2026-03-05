@@ -34,16 +34,37 @@ if [ ! -d "$TEMPLATE_DIR/.claude" ]; then
   exit 1
 fi
 
-# 2. 기존 .claude/ 백업
+# 2. .claude/ 병합 설치 (기존 사용자 파일 보존)
 if [ -d "$TARGET_DIR/.claude" ]; then
-  BACKUP_DIR="$TARGET_DIR/.claude.backup.$(date +%Y%m%d%H%M%S)"
-  echo "[백업] 기존 .claude/ -> $(basename "$BACKUP_DIR")"
-  mv "$TARGET_DIR/.claude" "$BACKUP_DIR"
-fi
+  echo "[병합] 기존 .claude/ 감지 — 병합 모드로 설치"
 
-# 3. 파일 복사
-echo "[복사] .claude/ 복사 중..."
-cp -r "$TEMPLATE_DIR/.claude" "$TARGET_DIR/.claude"
+  # 시스템 디렉토리: 템플릿으로 덮어쓰기 (hooks, hooks/lib)
+  echo "  [덮어쓰기] hooks/ (시스템 파일)"
+  mkdir -p "$TARGET_DIR/.claude/hooks/lib"
+  cp -f "$TEMPLATE_DIR/.claude/hooks/"*.sh "$TARGET_DIR/.claude/hooks/" 2>/dev/null || true
+  cp -f "$TEMPLATE_DIR/.claude/hooks/"*.yml "$TARGET_DIR/.claude/hooks/" 2>/dev/null || true
+  cp -f "$TEMPLATE_DIR/.claude/hooks/lib/"*.sh "$TARGET_DIR/.claude/hooks/lib/" 2>/dev/null || true
+
+  # agents, skills: 템플릿 파일 추가, 기존 사용자 파일 보존
+  for DIR in agents skills; do
+    if [ -d "$TEMPLATE_DIR/.claude/$DIR" ]; then
+      echo "  [병합] $DIR/ (기존 파일 보존)"
+      cp -rn "$TEMPLATE_DIR/.claude/$DIR" "$TARGET_DIR/.claude/" 2>/dev/null || \
+        rsync -a --ignore-existing "$TEMPLATE_DIR/.claude/$DIR/" "$TARGET_DIR/.claude/$DIR/"
+    fi
+  done
+
+  # settings.json: 없을 때만 복사
+  if [ ! -f "$TARGET_DIR/.claude/settings.json" ]; then
+    echo "  [복사] settings.json (신규)"
+    cp "$TEMPLATE_DIR/.claude/settings.json" "$TARGET_DIR/.claude/settings.json"
+  else
+    echo "  [유지] settings.json (기존 보존)"
+  fi
+else
+  echo "[복사] .claude/ 복사 중 (신규 설치)..."
+  cp -r "$TEMPLATE_DIR/.claude" "$TARGET_DIR/.claude"
+fi
 
 echo "[복사] docs/ 복사 중..."
 if [ -d "$TARGET_DIR/docs" ]; then
@@ -97,11 +118,8 @@ if $PASS; then
   echo "======================================="
   echo ""
   echo "다음 단계:"
-  echo "  1. Claude Code를 종료하세요 (/exit)"
-  echo "  2. 다시 시작하세요"
-  echo "  3. /setup 을 입력하여 초기화 위저드를 실행하세요"
-  echo ""
-  echo "재시작해야 스킬(/setup 등)이 인식됩니다."
+  echo "  1. Claude Code를 시작하세요 (claude)"
+  echo "  2. /setup 을 입력하여 초기화 위저드를 실행하세요"
 else
   echo "======================================="
   echo " 설치 불완전 - 위 누락 항목을 확인하세요"
