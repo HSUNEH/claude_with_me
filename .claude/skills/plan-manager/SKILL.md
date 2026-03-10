@@ -131,8 +131,11 @@ user-invocable: true
 
 ## 문서 저장 위치
 
+**반드시 프로젝트 루트(`.claude/`가 있는 디렉토리)의 `docs/plans/`에 저장한다.**
+현재 작업 디렉토리가 하위 폴더더라도, 절대 하위 폴더 안에 `docs/`를 생성하지 않는다.
+
 ```
-docs/plans/{작업명}/
+{프로젝트 루트}/docs/plans/{작업명}/
 ├── PLAN.md
 ├── CONTEXT.md
 └── CHECKLIST.md
@@ -140,6 +143,7 @@ docs/plans/{작업명}/
 
 - `{작업명}`은 kebab-case로 (예: `user-auth`, `api-refactor`)
 - 한 작업 = 한 폴더, 문서 3개가 항상 세트
+- 프로젝트 루트 판별: `.claude/` 디렉토리가 존재하는 가장 가까운 상위 디렉토리
 
 ## 승인 대기 규칙
 
