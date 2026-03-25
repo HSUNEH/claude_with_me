@@ -1,0 +1,8 @@
+{
+  "name": "cwm",
+  "version": "0.1.0",
+  "description": "CWM (Claude With Me) - Plan-first development workflow with queue system",
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "hooks": "./hooks/hooks.json"
+}
