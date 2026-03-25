@@ -1,8 +1,13 @@
 # CWM : Claude With Me
 
-Claude Code 플러그인으로 **Plan-first 개발 워크플로우**를 제공하는 하네스.
+<p align="center">
+  <img src="./assets/hero.png" alt="Claude With Me" width="600" />
+</p>
 
-큰 작업은 플랜부터, 간단한 작업은 바로 진행. Claude가 알아서 판단하고, 안전망이 잡아줍니다.
+<p align="center">
+  Claude Code 플러그인으로 <strong>Plan-first 개발 워크플로우</strong>를 제공하는 하네스.<br/>
+  큰 작업은 플랜부터, 간단한 작업은 바로 진행. Claude가 알아서 판단하고, 안전망이 잡아줍니다.
+</p>
 
 ---
 
