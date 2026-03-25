@@ -62,6 +62,12 @@
       "type": "file"
     },
     {
+      "path": "cwm/skills/setup/SKILL.md",
+      "accessCount": 2,
+      "lastAccessed": 1774419229394,
+      "type": "file"
+    },
+    {
       "path": ".claude-plugin/marketplace.json",
       "accessCount": 1,
       "lastAccessed": 1774416322014,
@@ -86,9 +92,9 @@
       "type": "file"
     },
     {
-      "path": "cwm/skills/setup/SKILL.md",
+      "path": "cwm/skills/custom_command/SKILL.md",
       "accessCount": 1,
-      "lastAccessed": 1774418954804,
+      "lastAccessed": 1774419247997,
       "type": "file"
     }
   ],
