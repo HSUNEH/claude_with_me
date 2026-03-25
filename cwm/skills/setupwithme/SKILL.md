@@ -118,7 +118,7 @@ user-invocable: true
 Phase 1의 "첫 번째 기능"으로 3문서 생성:
 
 ```
-docs/plans/{기능명-kebab-case}/
+.cwm/docs/plans/{기능명-kebab-case}/
 ├── PLAN.md          계획서
 ├── CONTEXT.md       맥락 노트
 ├── CHECKLIST.md     체크리스트
@@ -186,7 +186,7 @@ docs/plans/{기능명-kebab-case}/
 
 ## 컨텍스트 관리
 
-- **계획 → 구현 전환 시**: docs/plans/{작업명}/의 PLAN.md, CHECKLIST.md를 파일에서 다시 읽고 시작
+- **계획 → 구현 전환 시**: .cwm/docs/plans/{작업명}/의 PLAN.md, CHECKLIST.md를 파일에서 다시 읽고 시작
 - **새 세션에서 이어서**: .status가 "active"인 플랜을 찾아 CHECKLIST.md의 미체크 항목부터 이어서 진행
 
 ## 필수 워크플로우
@@ -207,7 +207,7 @@ docs/plans/{기능명-kebab-case}/
 ### 5-D: docs/ 디렉토리 구조
 
 ```bash
-mkdir -p docs/plans docs/logs docs/reports
+mkdir -p .cwm/docs/plans .cwm/docs/logs .cwm/docs/reports
 ```
 
 ### 5-E: 완료 마커
@@ -227,7 +227,7 @@ touch .cwm/.initialized
   .cwm/config.yml          ← Hook 설정
   .cwm/dev-manual/chapters/ ← 개발 매뉴얼 6챕터
   CLAUDE.md                ← 프로젝트 규칙
-  docs/plans/{첫기능}/     ← 초기 개발 계획 (🔴 대기)
+  .cwm/docs/plans/{첫기능}/ ← 초기 개발 계획 (🔴 대기)
 
 다음 단계:
   1. 초기 계획을 승인하면 구현을 시작합니다

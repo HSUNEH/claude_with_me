@@ -12,7 +12,12 @@ command -v jq &>/dev/null || exit 0
 
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 
-LOG_FILE="$CWD/docs/logs/change-log.md"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$SCRIPT_DIR/lib/matcher.sh" ]; then
+  source "$SCRIPT_DIR/lib/matcher.sh" 2>/dev/null
+fi
+
+LOG_FILE="$CWD/.cwm/docs/logs/change-log.md"
 [ ! -f "$LOG_FILE" ] && exit 0
 
 # ── 변경 파일 추출 ──
@@ -96,7 +101,7 @@ TOTAL_ISSUES=$((ERROR_COUNT + PATTERN_COUNT))
 
 if [ $TOTAL_ISSUES -eq 0 ]; then
   # 깔끔 → 플랜 상태 업데이트 안내만
-  PLANS_DIR="$CWD/docs/plans"
+  PLANS_DIR="$CWD/.cwm/docs/plans"
   if [ -d "$PLANS_DIR" ]; then
     for status_file in "$PLANS_DIR"/*/.status; do
       [ -f "$status_file" ] || continue

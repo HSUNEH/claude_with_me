@@ -15,7 +15,7 @@ model: sonnet
 1. 요구사항 분석
 2. 기존 코드 조사
 3. 기술 조사
-4. `docs/plans/{작업명}/`에 PLAN.md, CONTEXT.md, CHECKLIST.md, .status 생성
+4. `.cwm/docs/plans/{작업명}/`에 PLAN.md, CONTEXT.md, CHECKLIST.md, .status 생성
 
 ### B: 계획 검토
 - 계획이 현실적인가?
@@ -28,7 +28,7 @@ model: sonnet
 
 ## 보고서 작성
 
-**반드시** `docs/reports/planning-report-{날짜}.md` 에 작성:
+**반드시** `.cwm/docs/reports/planning-report-{날짜}.md` 에 작성:
 
 ```markdown
 # 기획 보고서

@@ -111,6 +111,6 @@ agents:
 # ─── 8. 일반 설정 ───────────────────────────────────────────
 general:
   require_plan: true
-  change_log_path: "docs/logs/change-log.md"
-  plans_path: "docs/plans"
-  reports_path: "docs/reports"
+  change_log_path: ".cwm/docs/logs/change-log.md"
+  plans_path: ".cwm/docs/plans"
+  reports_path: ".cwm/docs/reports"

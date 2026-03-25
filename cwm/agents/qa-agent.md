@@ -12,8 +12,8 @@ model: sonnet
 ## 작업 절차
 
 ### 1단계: 현황 파악
-- `docs/logs/change-log.md`에서 최근 변경 파일 파악
-- `docs/plans/*/CHECKLIST.md`에서 현재 작업 맥락 이해
+- `.cwm/docs/logs/change-log.md`에서 최근 변경 파일 파악
+- `.cwm/docs/plans/*/CHECKLIST.md`에서 현재 작업 맥락 이해
 
 ### 2단계: 코드 검토
 
@@ -27,7 +27,7 @@ model: sonnet
 
 ### 4단계: 보고서 작성
 
-**반드시** `docs/reports/qa-report-{날짜}.md` 에 보고서 작성:
+**반드시** `.cwm/docs/reports/qa-report-{날짜}.md` 에 보고서 작성:
 
 ```markdown
 # 품질관리 보고서

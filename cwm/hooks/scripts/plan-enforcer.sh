@@ -8,7 +8,7 @@
 #   - 활성 플랜(.status=active) 있으면 → 무조건 통과
 #   - 없으면 → 수정 파일 수 카운트
 #   - 임계값 초과 시 → exit 2 (차단)
-#   - docs/, .cwm/, .claude/ 내 파일은 카운트 제외
+#   - .cwm/, .claude/ 내 파일은 카운트 제외
 # ============================================================
 
 INPUT=$(cat)
@@ -24,7 +24,7 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 [[ "$TOOL_NAME" != "Edit" && "$TOOL_NAME" != "Write" ]] && exit 0
 
 # ── 설정 ──
-PLANS_DIR="$CWD/docs/plans"
+PLANS_DIR="$CWD/.cwm/docs/plans"
 STATE_DIR="$CWD/.cwm/state"
 TRACKER_FILE="$STATE_DIR/edit-tracker"
 THRESHOLD=3  # config.yml에서 읽기 가능하도록 확장 예정
@@ -49,7 +49,7 @@ fi
 
 # ── 비코드 파일은 카운트 제외 ──
 case "$FILE_PATH" in
-  */docs/*|*/.cwm/*|*/.claude/*|*/CLAUDE.md|*/.status|*/change-log.md)
+  */.cwm/*|*/.claude/*|*/CLAUDE.md|*/.status|*/change-log.md)
     exit 0
     ;;
 esac

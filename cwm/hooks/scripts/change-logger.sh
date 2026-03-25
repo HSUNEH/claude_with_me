@@ -2,7 +2,7 @@
 # ============================================================
 # [PostToolUse Hook] CWM Change Logger
 # ============================================================
-# 변경 내역을 docs/logs/change-log.md에 자동 기록.
+# 변경 내역을 .cwm/docs/logs/change-log.md에 자동 기록.
 # stdout 없음 — 컨텍스트 오염 방지.
 # ============================================================
 
@@ -14,7 +14,7 @@ TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
-LOG_DIR="$CWD/docs/logs"
+LOG_DIR="$CWD/.cwm/docs/logs"
 LOG_FILE="$LOG_DIR/change-log.md"
 
 mkdir -p "$LOG_DIR"

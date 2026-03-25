@@ -20,7 +20,7 @@ user-invocable: true
    └── 구현 전략 설계
        │
        ▼
-3. 4파일 생성 → docs/plans/{작업명}/
+3. 4파일 생성 → .cwm/docs/plans/{작업명}/
    ├── PLAN.md         계획서
    ├── CONTEXT.md      맥락 노트
    ├── CHECKLIST.md    체크리스트
@@ -119,13 +119,13 @@ user-invocable: true
 - `complete` — 작업 완료
 
 ```bash
-echo "pending" > docs/plans/{작업명}/.status
+echo "pending" > .cwm/docs/plans/{작업명}/.status
 ```
 
 ## 문서 저장 위치
 
 ```
-{프로젝트 루트}/docs/plans/{작업명}/
+{프로젝트 루트}/.cwm/docs/plans/{작업명}/
 ├── PLAN.md
 ├── CONTEXT.md
 ├── CHECKLIST.md
@@ -142,7 +142,7 @@ echo "pending" > docs/plans/{작업명}/.status
 ```
 📋 계획 수립 완료 — 검토 요청
 
-📂 docs/plans/{작업명}/
+📂 .cwm/docs/plans/{작업명}/
   ├── PLAN.md       ← 전체 구현 계획
   ├── CONTEXT.md    ← 결정 근거
   ├── CHECKLIST.md  ← 작업 체크리스트
@@ -167,7 +167,7 @@ echo "pending" > docs/plans/{작업명}/.status
 
 ### Step 1: 상태 변경
 ```bash
-echo "active" > docs/plans/{작업명}/.status
+echo "active" > .cwm/docs/plans/{작업명}/.status
 ```
 
 CHECKLIST.md의 "사용자 승인 완료" 체크:
@@ -182,7 +182,7 @@ CHECKLIST.md의 "사용자 승인 완료" 체크:
 ✅ 계획이 승인되었습니다
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📂 docs/plans/{작업명}/.status → active
+📂 .cwm/docs/plans/{작업명}/.status → active
 
 컨텍스트를 정리하면 더 원활합니다.
 
@@ -210,7 +210,7 @@ CHECKLIST.md 체크:
 
 모든 Phase 완료 시:
 ```bash
-echo "complete" > docs/plans/{작업명}/.status
+echo "complete" > .cwm/docs/plans/{작업명}/.status
 ```
 
 ```
@@ -218,7 +218,7 @@ echo "complete" > docs/plans/{작업명}/.status
 ✅ {작업명} 완료
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-docs/plans/{작업명}/.status → complete
+.cwm/docs/plans/{작업명}/.status → complete
 ```
 
 ## 중요 규칙
@@ -227,4 +227,4 @@ docs/plans/{작업명}/.status → complete
 2. **승인 필수** — 같은 턴에서 코드 작성 금지
 3. **.status로 추적** — pending/active/complete
 4. **실시간 갱신** — CHECKLIST.md 계속 업데이트
-5. **맥락 보존** — 새 세션에서도 docs/plans/ 읽으면 이어서 가능
+5. **맥락 보존** — 새 세션에서도 .cwm/docs/plans/ 읽으면 이어서 가능

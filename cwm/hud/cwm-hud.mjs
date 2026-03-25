@@ -62,7 +62,7 @@ function renderContextBar(pct, maxK, barColor) {
 }
 
 function getPlanStatus(cwd) {
-  var plansDir = join(cwd, "docs", "plans");
+  var plansDir = join(cwd, ".cwm", "docs", "plans");
   if (!existsSync(plansDir)) return "";
 
   var active = 0, pending = 0, complete = 0, activeName = "";

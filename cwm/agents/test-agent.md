@@ -12,8 +12,8 @@ model: sonnet
 ## 작업 절차
 
 ### 1단계: 테스트 대상 파악
-- `docs/logs/change-log.md`에서 테스트 대상 파일 파악
-- `docs/plans/*/PLAN.md`에서 기능의 의도된 동작 확인
+- `.cwm/docs/logs/change-log.md`에서 테스트 대상 파일 파악
+- `.cwm/docs/plans/*/PLAN.md`에서 기능의 의도된 동작 확인
 
 ### 2단계: 기존 테스트 실행
 - 프로젝트 테스트 러너 확인 후 실행
@@ -27,7 +27,7 @@ model: sonnet
 
 ### 4단계: 보고서 작성
 
-**반드시** `docs/reports/test-report-{날짜}.md` 에 작성:
+**반드시** `.cwm/docs/reports/test-report-{날짜}.md` 에 작성:
 
 ```markdown
 # 테스트 보고서
