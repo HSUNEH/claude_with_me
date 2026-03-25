@@ -20,6 +20,17 @@ var C_GRAY = "\x1b[38;5;245m";
 var C_GREEN = "\x1b[38;5;76m";
 var C_YELLOW = "\x1b[33m";
 var C_RED = "\x1b[38;5;203m";
+var C_BLUE = "\x1b[38;5;75m";
+var C_ORANGE = "\x1b[38;5;173m";
+
+function getModelColor(modelName) {
+  if (!modelName) return C_ACCENT;
+  var lower = modelName.toLowerCase();
+  if (lower.indexOf("opus") !== -1) return C_ORANGE;
+  if (lower.indexOf("sonnet") !== -1) return C_BLUE;
+  if (lower.indexOf("haiku") !== -1) return C_GREEN;
+  return C_ACCENT;
+}
 
 function g(obj, path) {
   var keys = path.split(".");
@@ -31,7 +42,8 @@ function g(obj, path) {
   return v;
 }
 
-function renderContextBar(pct, maxK) {
+function renderContextBar(pct, maxK, barColor) {
+  var color = barColor || C_ACCENT;
   var barWidth = 10;
   var clamped = Math.min(pct, 100);
   var bar = "";
@@ -39,9 +51,9 @@ function renderContextBar(pct, maxK) {
     var barStart = i * 10;
     var progress = clamped - barStart;
     if (progress >= 8) {
-      bar += C_ACCENT + "\u2588" + C_RESET;
+      bar += color + "\u2588" + C_RESET;
     } else if (progress >= 3) {
-      bar += C_ACCENT + "\u2584" + C_RESET;
+      bar += color + "\u2584" + C_RESET;
     } else {
       bar += C_BAR_EMPTY + "\u2591" + C_RESET;
     }
@@ -155,14 +167,19 @@ async function main() {
     } catch (_e) { branch += "?"; }
   } catch (_e) { /* not a git repo */ }
 
-  // context bar
+  // model info
+  var modelObj = data && data.model;
+  var modelName = (modelObj && modelObj.display_name) || "";
+  var modelColor = getModelColor(modelName);
+
+  // context bar (colored by model)
   var ctxWin = data && data.context_window;
   var ctxPct = ctxWin && ctxWin.used_percentage;
   var ctxSize = (ctxWin && ctxWin.context_window_size) || 200000;
   var maxK = Math.round(ctxSize / 1000);
   var ctxBar = "";
   if (ctxPct != null) {
-    ctxBar = renderContextBar(Math.round(ctxPct), maxK);
+    ctxBar = renderContextBar(Math.round(ctxPct), maxK, modelColor);
   }
 
   // call counts
