@@ -17,11 +17,36 @@ git clone https://github.com/HSUNEH/cwm.git
 claude plugin add ./cwm
 ```
 
-설치 후 프로젝트에서 초기화:
+설치 후 프로젝트 세팅:
+
+**1. 프로젝트 초기화**
 
 ```
 /cwm:setupwithme
 ```
+
+5단계 위저드로 `.cwm/config.yml`, 개발 매뉴얼, `CLAUDE.md`, 초기 플랜을 생성합니다.
+
+**2. HUD 설치 (선택)**
+
+```
+/cwm:custom_command
+```
+
+상태줄에 CWM 전용 HUD를 표시합니다:
+
+```
+📂 my-app | 🔀 main | ▓▓▓░░░░░░░ 28% | 🔧12 🤖2 ⚡3 | 📋 user-auth | 5h
+```
+
+| 항목 | 설명 |
+|------|------|
+| `📂 my-app` | 현재 작업 폴더 |
+| `🔀 main` | Git 브랜치 |
+| `▓▓▓░░░░░░░ 28%` | 컨텍스트 사용량 |
+| `🔧12 🤖2 ⚡3` | tool / agent / skill 호출 횟수 |
+| `📋 user-auth` | 현재 활성 플랜 이름 (.cwm/docs/plans/ 기반) |
+| `5h` | 남은 사용 한도 |
 
 ### What You'll See
 
