@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"grep -r \\\"statusline\\\\|custom-command\\\\|custom_command\\\" /Users/hwangseontae/.claude/settings.json /Users/hwangseontae/.claude/settings.local.json 2>/dev/null | head -10\\necho \\\"---\\\"\\n# p...",
+  "error": "Exit code 1\n---",
+  "timestamp": "2026-03-25T05:44:36.138Z",
+  "retry_count": 2
+}

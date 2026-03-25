@@ -50,6 +50,12 @@
       "type": "file"
     },
     {
+      "path": "cwm/hooks/hooks.json",
+      "accessCount": 2,
+      "lastAccessed": 1774417564484,
+      "type": "file"
+    },
+    {
       "path": ".claude-plugin/marketplace.json",
       "accessCount": 1,
       "lastAccessed": 1774416322014,
@@ -59,6 +65,18 @@
       "path": ".claude-plugin/plugin.json",
       "accessCount": 1,
       "lastAccessed": 1774416322775,
+      "type": "file"
+    },
+    {
+      "path": "cwm/hud/cwm-hud.mjs",
+      "accessCount": 1,
+      "lastAccessed": 1774417547439,
+      "type": "file"
+    },
+    {
+      "path": "cwm/scripts/setup-hud.sh",
+      "accessCount": 1,
+      "lastAccessed": 1774417552374,
       "type": "file"
     }
   ],

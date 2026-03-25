@@ -1,6 +1,16 @@
 {
   "hooks": [
     {
+      "event": "SessionStart",
+      "commands": [
+        {
+          "type": "command",
+          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/setup-hud.sh",
+          "timeout": 5000
+        }
+      ]
+    },
+    {
       "event": "PreToolUse",
       "matcher": {
         "tool_name": "Edit|Write"
