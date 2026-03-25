@@ -1,3 +1,4 @@
 .DS_Store
+.omc/
 .claude/.initialized
 .claude/.setup-in-progress

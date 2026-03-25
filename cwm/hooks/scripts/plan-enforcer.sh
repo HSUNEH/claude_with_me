@@ -20,6 +20,9 @@ TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 
+# CWM 초기화된 프로젝트가 아니면 스킵
+[ -f "$CWD/.cwm/.initialized" ] || exit 0
+
 # Edit/Write 외 도구는 통과
 [[ "$TOOL_NAME" != "Edit" && "$TOOL_NAME" != "Write" ]] && exit 0
 

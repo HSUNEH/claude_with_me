@@ -12,6 +12,10 @@ command -v jq &>/dev/null || exit 0
 
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
+
+# CWM 초기화된 프로젝트가 아니면 스킵
+[ -f "$CWD/.cwm/.initialized" ] || exit 0
+
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
 LOG_DIR="$CWD/.cwm/docs/logs"

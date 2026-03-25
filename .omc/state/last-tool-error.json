@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"# OMC 에이전트 frontmatter 형식 확인\\necho \\\"=== OMC agent sample frontmatter ===\\\"\\nhead -15 /Users/hwangseontae/.claude/plugins/cache/omc/oh-my-claudecode/4.9.0/agents/architect.md\\n\\necho \\\"\\\"\\...",
-  "error": "Exit code 1\n=== OMC agent sample frontmatter ===\n---\nname: architect\ndescription: Strategic Architecture & Debugging Advisor (Opus, READ-ONLY)\nmodel: claude-opus-4-6\nlevel: 3\ndisallowedTools: Write, Edit\n---\n\n<Agent_Prompt>\n  <Role>\n    You are Architect. Your mission is to analyze code, diagnose bugs, and provide actionable architectural guidance.\n    You are responsible for code analysis, implementation verification, debugging root causes, and architectural recommendations.\n    You are not res...",
-  "timestamp": "2026-03-25T06:30:30.246Z",
-  "retry_count": 1
-}

@@ -12,6 +12,9 @@ command -v jq &>/dev/null || exit 0
 
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 
+# CWM 초기화된 프로젝트가 아니면 스킵
+[ -f "$CWD/.cwm/.initialized" ] || exit 0
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 if [ -f "$SCRIPT_DIR/lib/matcher.sh" ]; then
   source "$SCRIPT_DIR/lib/matcher.sh" 2>/dev/null
