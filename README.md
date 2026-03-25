@@ -16,7 +16,7 @@
 ### 1. 마켓플레이스 등록 (최초 1회)
 
 ```
-/plugin marketplace add https://github.com/HSUNEH/claude_with_me
+/plugin marketplace add https://github.com/HSUNEH/dev_sys_template
 ```
 
 ### 2. 플러그인 설치
