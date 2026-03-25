@@ -1,18 +1,20 @@
 {
   "name": "cwm",
-  "version": "0.1.0",
-  "description": "CWM (Claude With Me) - Plan-first development workflow with queue system",
+  "version": "2.0.0",
+  "description": "CWM (Claude With Me) - Plan-first development workflow",
   "author": "HSUNEH",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/HSUNEH/cwm"
+    "url": "https://github.com/HSUNEH/claude_with_me"
   },
   "files": [
     ".claude-plugin/",
     "hooks/",
     "skills/",
     "agents/",
-    "templates/"
+    "templates/",
+    "hud/",
+    "scripts/"
   ]
 }

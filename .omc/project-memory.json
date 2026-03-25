@@ -45,8 +45,14 @@
   "hotPaths": [
     {
       "path": "cwm/hud/cwm-hud.mjs",
-      "accessCount": 7,
-      "lastAccessed": 1774419783392,
+      "accessCount": 16,
+      "lastAccessed": 1774420443225,
+      "type": "file"
+    },
+    {
+      "path": "cwm/hooks/hooks.json",
+      "accessCount": 5,
+      "lastAccessed": 1774420375082,
       "type": "file"
     },
     {
@@ -56,15 +62,33 @@
       "type": "file"
     },
     {
-      "path": "cwm/hooks/hooks.json",
+      "path": "cwm/.claude-plugin/plugin.json",
       "accessCount": 3,
-      "lastAccessed": 1774420110487,
+      "lastAccessed": 1774420184690,
       "type": "file"
     },
     {
-      "path": "cwm/.claude-plugin/plugin.json",
-      "accessCount": 2,
-      "lastAccessed": 1774417978346,
+      "path": "cwm/skills/custom_command/SKILL.md",
+      "accessCount": 3,
+      "lastAccessed": 1774420191965,
+      "type": "file"
+    },
+    {
+      "path": "cwm/.claude-plugin/marketplace.json",
+      "accessCount": 3,
+      "lastAccessed": 1774420422234,
+      "type": "file"
+    },
+    {
+      "path": "cwm/package.json",
+      "accessCount": 3,
+      "lastAccessed": 1774420422434,
+      "type": "file"
+    },
+    {
+      "path": "cwm/hooks/scripts/completion-checker.sh",
+      "accessCount": 3,
+      "lastAccessed": 1774420444817,
       "type": "file"
     },
     {
@@ -74,9 +98,9 @@
       "type": "file"
     },
     {
-      "path": "cwm/skills/custom_command/SKILL.md",
+      "path": "cwm/scripts/setup-hud.sh",
       "accessCount": 2,
-      "lastAccessed": 1774419688860,
+      "lastAccessed": 1774420198285,
       "type": "file"
     },
     {
@@ -92,9 +116,63 @@
       "type": "file"
     },
     {
-      "path": "cwm/scripts/setup-hud.sh",
+      "path": "cwm/skills/dev-manual/SKILL.md",
       "accessCount": 1,
-      "lastAccessed": 1774417552374,
+      "lastAccessed": 1774420192316,
+      "type": "file"
+    },
+    {
+      "path": "cwm/skills/planwithme/SKILL.md",
+      "accessCount": 1,
+      "lastAccessed": 1774420193017,
+      "type": "file"
+    },
+    {
+      "path": "cwm/skills/setupwithme/SKILL.md",
+      "accessCount": 1,
+      "lastAccessed": 1774420193383,
+      "type": "file"
+    },
+    {
+      "path": "cwm/agents/planning-agent.md",
+      "accessCount": 1,
+      "lastAccessed": 1774420194152,
+      "type": "file"
+    },
+    {
+      "path": "cwm/agents/qa-agent.md",
+      "accessCount": 1,
+      "lastAccessed": 1774420194512,
+      "type": "file"
+    },
+    {
+      "path": "cwm/agents/test-agent.md",
+      "accessCount": 1,
+      "lastAccessed": 1774420194927,
+      "type": "file"
+    },
+    {
+      "path": "cwm/hooks/scripts/plan-enforcer.sh",
+      "accessCount": 1,
+      "lastAccessed": 1774420195665,
+      "type": "file"
+    },
+    {
+      "path": "cwm/hooks/scripts/change-logger.sh",
+      "accessCount": 1,
+      "lastAccessed": 1774420195990,
+      "type": "file"
+    },
+    {
+      "path": "cwm/hooks/scripts/lib/config-parser.sh",
+      "accessCount": 1,
+      "lastAccessed": 1774420197286,
+      "type": "file"
+    },
+    {
+      "path": "cwm/templates/config.yml",
+      "accessCount": 1,
+      "lastAccessed": 1774420199369,
       "type": "file"
     }
   ],

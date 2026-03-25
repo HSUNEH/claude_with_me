@@ -4,12 +4,12 @@
  * Compatible with Node.js 12+
  */
 
-import { execSync } from "node:child_process";
-import { basename } from "node:path";
-import { existsSync, statSync, openSync, readSync, closeSync, readdirSync, readFileSync } from "node:fs";
-import { createReadStream } from "node:fs";
-import { createInterface } from "node:readline";
-import { join } from "node:path";
+import { execSync } from "child_process";
+import { basename } from "path";
+import { existsSync, statSync, openSync, readSync, closeSync, readdirSync, readFileSync } from "fs";
+import { createReadStream } from "fs";
+import { createInterface } from "readline";
+import { join } from "path";
 
 var MAX_TAIL_BYTES = 512 * 1024;
 
@@ -81,9 +81,9 @@ function getPlanStatus(cwd) {
   } catch (_e) { return ""; }
 
   if (active > 0) {
-    return C_YELLOW + "\u{1F4CB} " + activeName + C_RESET;
+    return C_YELLOW + "\uD83D\uDCCB " + activeName + C_RESET;
   } else if (pending > 0) {
-    return C_RED + "\u{1F4CB} " + pending + " pending" + C_RESET;
+    return C_RED + "\uD83D\uDCCB " + pending + " pending" + C_RESET;
   } else if (complete > 0) {
     return C_GREEN + "\u2713 " + complete + " done" + C_RESET;
   }

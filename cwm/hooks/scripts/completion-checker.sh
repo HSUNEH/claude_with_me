@@ -12,11 +12,6 @@ command -v jq &>/dev/null || exit 0
 
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-if [ -f "$SCRIPT_DIR/lib/matcher.sh" ]; then
-  source "$SCRIPT_DIR/lib/matcher.sh" 2>/dev/null
-fi
-
 LOG_FILE="$CWD/docs/logs/change-log.md"
 [ ! -f "$LOG_FILE" ] && exit 0
 
