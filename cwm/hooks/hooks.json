@@ -1,53 +1,55 @@
 {
-  "hooks": [
-    {
-      "event": "SessionStart",
-      "commands": [
-        {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/setup-hud.sh",
-          "timeout": 5000
-        }
-      ]
-    },
-    {
-      "event": "PreToolUse",
-      "matcher": {
-        "tool_name": "Edit|Write"
-      },
-      "commands": [
-        {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/plan-enforcer.sh",
-          "timeout": 5000,
-          "statusMessage": "CWM: plan check"
-        }
-      ]
-    },
-    {
-      "event": "PostToolUse",
-      "matcher": {
-        "tool_name": "Edit|Write|Bash"
-      },
-      "commands": [
-        {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/change-logger.sh",
-          "timeout": 3000,
-          "statusMessage": "CWM: logging"
-        }
-      ]
-    },
-    {
-      "event": "Stop",
-      "commands": [
-        {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/completion-checker.sh",
-          "timeout": 30000,
-          "statusMessage": "CWM: quality check"
-        }
-      ]
-    }
-  ]
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/setup-hud.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/plan-enforcer.sh",
+            "timeout": 5000,
+            "statusMessage": "CWM: plan check"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/change-logger.sh",
+            "timeout": 3000,
+            "statusMessage": "CWM: logging"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/completion-checker.sh",
+            "timeout": 30000,
+            "statusMessage": "CWM: quality check"
+          }
+        ]
+      }
+    ]
+  }
 }
