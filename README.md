@@ -6,7 +6,8 @@
 
 <p align="center">
   Claude Code 플러그인으로 <strong>Plan-first 개발 워크플로우</strong>를 제공하는 하네스.<br/>
-  큰 작업은 플랜부터, 간단한 작업은 바로 진행. Claude가 알아서 판단하고, 안전망이 잡아줍니다.
+  Claude와 함께 계획하고, 판단하세요!<br/>
+  (토큰 관리 최적화 for Claude Pro Users)
 </p>
 
 ---
