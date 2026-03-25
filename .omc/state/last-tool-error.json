@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"grep -r \\\"statusline\\\\|custom-command\\\\|custom_command\\\" /Users/hwangseontae/.claude/settings.json /Users/hwangseontae/.claude/settings.local.json 2>/dev/null | head -10\\necho \\\"---\\\"\\n# p...",
-  "error": "Exit code 1\n---",
-  "timestamp": "2026-03-25T05:44:36.138Z",
+  "tool_input_preview": "{\"command\":\"git -C /Users/hwangseontae/dev_CWM/dev_sys_template pull --rebase origin main && git push origin main\",\"description\":\"리모트 변경사항 pull 후 push\"}",
+  "error": "Exit code 128\nerror: cannot pull with rebase: You have unstaged changes.\nerror: please commit or stash them.",
+  "timestamp": "2026-03-25T05:50:32.524Z",
   "retry_count": 2
 }

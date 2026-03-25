@@ -56,6 +56,12 @@
       "type": "file"
     },
     {
+      "path": "cwm/.claude-plugin/plugin.json",
+      "accessCount": 2,
+      "lastAccessed": 1774417978346,
+      "type": "file"
+    },
+    {
       "path": ".claude-plugin/marketplace.json",
       "accessCount": 1,
       "lastAccessed": 1774416322014,
