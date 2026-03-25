@@ -1,4 +1,4 @@
-# CWM (Claude With Me)
+# CWM : Claude With Me
 
 <p align="center">
   <img src="./assets/hero.png" alt="Claude With Me" width="600" />
