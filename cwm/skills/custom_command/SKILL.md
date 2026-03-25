@@ -16,6 +16,18 @@ user-invocable: true
 
 ## 실행 절차
 
+### 0. 사전 점검
+
+설치 전 먼저 확인:
+
+```bash
+node --version
+which jq
+```
+
+- **Node.js 미설치** → "Node.js가 필요합니다. 설치 후 다시 시도하세요." 출력 후 중단.
+- **jq 미설치** → "jq가 필요합니다 (훅 의존성). `apt install jq` 또는 `brew install jq`로 설치하세요." 경고 출력 (중단하지는 않음).
+
 ### 1. 현재 statusLine 확인
 
 `~/.claude/settings.json`을 읽어서 `statusLine` 항목을 확인한다.
