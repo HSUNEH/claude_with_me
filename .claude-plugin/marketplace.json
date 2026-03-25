@@ -1,0 +1,29 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "cwm",
+  "description": "CWM (Claude With Me) - Plan-first development workflow with queue system",
+  "owner": {
+    "name": "HSUNEH",
+    "email": ""
+  },
+  "plugins": [
+    {
+      "name": "cwm",
+      "description": "Plan-first development workflow. 3-layer enforcement, .status-based plan tracking, auto quality checks.",
+      "version": "2.0.0",
+      "author": {
+        "name": "HSUNEH"
+      },
+      "source": "./cwm",
+      "category": "productivity",
+      "homepage": "https://github.com/HSUNEH/claude_with_me",
+      "tags": [
+        "plan-first",
+        "workflow",
+        "quality-check",
+        "subagent"
+      ]
+    }
+  ],
+  "version": "2.0.0"
+}
