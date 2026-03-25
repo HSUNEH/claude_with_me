@@ -1,4 +1,4 @@
-# CWM (Claude With Me)
+# CWM : Claude With Me
 
 Claude Code 플러그인으로 **Plan-first 개발 워크플로우**를 제공하는 하네스.
 
