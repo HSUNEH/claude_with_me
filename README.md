@@ -46,36 +46,6 @@
 | `📋 user-auth` | 현재 활성 플랜 이름 (.cwm/docs/plans/ 기반) |
 | `██░ 26m:65%` | 5h 리밋 (남은 시간 : 사용 퍼센티지) |
 
-### What You'll See
-
-설치 후 Claude Code 사용 중 CWM 훅이 자동으로 동작하며, 상태줄에 표시됩니다:
-
-```
- ⠋ CWM: plan check              ← Edit/Write 전 플랜 확인 중
- ⠋ CWM: logging                 ← 변경사항 자동 기록 중
- ⠋ CWM: quality check           ← 세션 종료 시 품질 검사 중
-```
-
-플랜 없이 3개 이상 파일을 수정하면 차단됩니다:
-
-```
-⛔ [CWM] 플랜 없이 3개 파일을 수정하려 합니다
-
-  /cwm:planwithme {작업명}  → 플랜을 먼저 세우세요
-  "간단: {요청}"            → 플랜 없이 계속 진행
-```
-
-세션 종료 시 이슈가 있으면 알려줍니다:
-
-```
-⚠️ [CWM] 2 issues found — fix directly
-
-[ESLint] src/auth.ts:
-  12:5  error  'token' is defined but never used
-[Security] src/db.ts:
-  8: const password = "admin123"
-```
-
 ---
 
 ## 사용법
@@ -114,6 +84,36 @@
 | 3 | **plan-enforcer** | 플랜 없이 3개+ 파일 수정 시 차단 (PreToolUse, exit 2) |
 
 > 모든 훅은 `/cwm:setupwithme`로 초기화된 프로젝트에서만 동작합니다.
+
+### What You'll See
+
+CWM 훅이 동작하면 상태줄에 표시됩니다:
+
+```
+ ⠋ CWM: plan check              ← Edit/Write 전 플랜 확인 중
+ ⠋ CWM: logging                 ← 변경사항 자동 기록 중
+ ⠋ CWM: quality check           ← 세션 종료 시 품질 검사 중
+```
+
+플랜 없이 3개 이상 파일을 수정하면 차단됩니다:
+
+```
+⛔ [CWM] 플랜 없이 3개 파일을 수정하려 합니다
+
+  /cwm:planwithme {작업명}  → 플랜을 먼저 세우세요
+  "간단: {요청}"            → 플랜 없이 계속 진행
+```
+
+세션 종료 시 이슈가 있으면 알려줍니다:
+
+```
+⚠️ [CWM] 2 issues found — fix directly
+
+[ESLint] src/auth.ts:
+  12:5  error  'token' is defined but never used
+[Security] src/db.ts:
+  8: const password = "admin123"
+```
 
 ---
 
