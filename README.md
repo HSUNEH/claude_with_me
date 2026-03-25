@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-  Claude Code 플러그인으로 <strong>Plan-first 개발 워크플로우</strong>를 제공하는 하네스.<br/>
-  Claude와 함께 계획하고, 판단하세요!<br/>
+  Claude Code 플러그인으로 Plan-승인-개발 워크플로우를 제공하는 하네스.<br/>
+  <strong>Claude와 함께 계획하고, 판단하세요!</strong><br/>
   (토큰 관리 최적화 for Claude Pro Users)
 </p>
 
