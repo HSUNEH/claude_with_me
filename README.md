@@ -26,7 +26,7 @@
 /plugin install cwm
 ```
 
-> ⚠️ **설치 후 반드시 Claude Code를 종료(`exit`)하고 다시 시작하세요.**
+> ⚠️ **설치 후 반드시 Claude Code를 종료(`exit`)하고 다시 시작하세요.**<br/>
 > `/reload-plugins`로는 skills가 인식되지 않습니다. 재시작 후 `/cwm:setupwithme`가 정상 동작합니다.
 
 ### 3. HUD 설치 (선택)
