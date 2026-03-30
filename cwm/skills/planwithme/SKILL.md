@@ -48,7 +48,7 @@ done
    └── 구현 전략 설계
        │
        ▼
-3. 4파일 생성 → .cwm/docs/plans/{작업명}/
+3. 4파일 생성 → .cwm/docs/plans/{YYMMDD}-{작업명}/
    ├── PLAN.md         계획서
    ├── CONTEXT.md      맥락 노트
    ├── CHECKLIST.md    체크리스트
@@ -147,13 +147,13 @@ done
 - `complete` — 작업 완료
 
 ```bash
-echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
+echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.status
 ```
 
 ## 문서 저장 위치
 
 ```
-{프로젝트 루트의 절대 경로}/.cwm/docs/plans/{작업명}/
+{프로젝트 루트의 절대 경로}/.cwm/docs/plans/{YYMMDD}-{작업명}/
 ├── PLAN.md
 ├── CONTEXT.md
 ├── CHECKLIST.md
@@ -161,9 +161,10 @@ echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
 ```
 
 - **프로젝트 루트** = `.cwm/.initialized`가 존재하는 디렉토리 (위의 "프로젝트 루트 결정" 참조)
-- 작업명은 kebab-case (예: `user-auth`, `api-refactor`)
+- **폴더명 = `YYYYMMDD-작업명`** (예: `260330-user-auth`, `260330-api-refactor`)
+- 작업명은 kebab-case
 - 한 작업 = 한 폴더, 4파일이 항상 세트
-- **파일 생성 시 반드시 절대 경로 사용** (예: `/Users/me/my-project/.cwm/docs/plans/user-auth/PLAN.md`)
+- **파일 생성 시 반드시 절대 경로 사용** (예: `/Users/me/my-project/.cwm/docs/plans/260330-user-auth/PLAN.md`)
 
 ## 승인 대기
 
@@ -172,7 +173,7 @@ echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
 ```
 📋 계획 수립 완료 — 검토 요청
 
-📂 .cwm/docs/plans/{작업명}/
+📂 .cwm/docs/plans/{YYMMDD}-{작업명}/
   ├── PLAN.md       ← 전체 구현 계획
   ├── CONTEXT.md    ← 결정 근거
   ├── CHECKLIST.md  ← 작업 체크리스트
@@ -197,7 +198,7 @@ echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
 
 ### Step 1: 상태 변경
 ```bash
-echo "active" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
+echo "active" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.status
 ```
 
 CHECKLIST.md의 "사용자 승인 완료" 체크:
@@ -212,7 +213,8 @@ CHECKLIST.md의 "사용자 승인 완료" 체크:
 ✅ 계획이 승인되었습니다
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📂 .cwm/docs/plans/{작업명}/.status → active
+📂 .cwm/docs/plans/{YYMMDD}-{작업명}/.status → active
+
 
 컨텍스트를 정리하면 더 원활합니다.
 
@@ -242,7 +244,7 @@ CHECKLIST.md 체크:
 
 모든 Phase 완료 시:
 ```bash
-echo "complete" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
+echo "complete" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.status
 ```
 
 ```
@@ -250,7 +252,7 @@ echo "complete" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
 ✅ {작업명} 완료
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-.cwm/docs/plans/{작업명}/.status → complete
+.cwm/docs/plans/{YYMMDD}-{작업명}/.status → complete
 ```
 
 ## 중요 규칙
