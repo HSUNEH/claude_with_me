@@ -11,16 +11,22 @@ INPUT=$(cat)
 command -v jq &>/dev/null || exit 0
 
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
+CWD=$(cd "$CWD" 2>/dev/null && pwd) || exit 0
 
-# CWM 초기화된 프로젝트가 아니면 스킵
-[ -f "$CWD/.cwm/.initialized" ] || exit 0
+# ── 프로젝트 루트 찾기 (CWD에서 상위로 .cwm/.initialized 탐색) ──
+PROJECT_ROOT="$CWD"
+while [ "$PROJECT_ROOT" != "/" ]; do
+  [ -f "$PROJECT_ROOT/.cwm/.initialized" ] && break
+  PROJECT_ROOT=$(dirname "$PROJECT_ROOT")
+done
+[ -f "$PROJECT_ROOT/.cwm/.initialized" ] || exit 0
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 if [ -f "$SCRIPT_DIR/lib/matcher.sh" ]; then
   source "$SCRIPT_DIR/lib/matcher.sh" 2>/dev/null
 fi
 
-LOG_FILE="$CWD/.cwm/docs/logs/change-log.md"
+LOG_FILE="$PROJECT_ROOT/.cwm/docs/logs/change-log.md"
 [ ! -f "$LOG_FILE" ] && exit 0
 
 # ── 변경 파일 추출 ──
@@ -40,7 +46,7 @@ if command -v npx &>/dev/null; then
     for f in $CHANGED_FILES; do
       if [[ "$f" == *.ts || "$f" == *.tsx || "$f" == *.js || "$f" == *.jsx ]]; then
         TARGET="$f"
-        [ ! -f "$TARGET" ] && TARGET="$CWD/$f"
+        [ ! -f "$TARGET" ] && TARGET="$PROJECT_ROOT/$f"
         if [ -f "$TARGET" ]; then
           LINT_RESULT=$(cd "$CWD" && npx eslint "$TARGET" --no-color 2>&1 | tail -5)
           if [ -n "$LINT_RESULT" ] && echo "$LINT_RESULT" | grep -qiE "(error|warning)"; then
@@ -67,7 +73,7 @@ if command -v python3 &>/dev/null; then
   for f in $CHANGED_FILES; do
     if [[ "$f" == *.py ]]; then
       TARGET="$f"
-      [ ! -f "$TARGET" ] && TARGET="$CWD/$f"
+      [ ! -f "$TARGET" ] && TARGET="$PROJECT_ROOT/$f"
       if [ -f "$TARGET" ]; then
         PY_RESULT=$(python3 -m py_compile "$TARGET" 2>&1)
         if [ $? -ne 0 ]; then
@@ -82,7 +88,7 @@ fi
 # ── 코드 패턴 검사 ──
 for f in $CHANGED_FILES; do
   TARGET="$f"
-  [ ! -f "$TARGET" ] && TARGET="$CWD/$f"
+  [ ! -f "$TARGET" ] && TARGET="$PROJECT_ROOT/$f"
   if [ -f "$TARGET" ]; then
     # 보안 위험 함수
     SEC=$(grep -nE '(eval\(|innerHTML|dangerouslySetInnerHTML|exec\()' "$TARGET" 2>/dev/null | head -3)
@@ -104,7 +110,7 @@ TOTAL_ISSUES=$((ERROR_COUNT + PATTERN_COUNT))
 
 if [ $TOTAL_ISSUES -eq 0 ]; then
   # 깔끔 → 플랜 상태 업데이트 안내만
-  PLANS_DIR="$CWD/.cwm/docs/plans"
+  PLANS_DIR="$PROJECT_ROOT/.cwm/docs/plans"
   if [ -d "$PLANS_DIR" ]; then
     for status_file in "$PLANS_DIR"/*/.status; do
       [ -f "$status_file" ] || continue

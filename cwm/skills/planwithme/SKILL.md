@@ -8,6 +8,34 @@ user-invocable: true
 
 > 모든 개발 작업은 **계획 수립 → 승인 → 실행** 순서를 따른다.
 
+## ⚠️ 프로젝트 루트 결정 (필수)
+
+플랜 생성/조회 전에 **반드시** 프로젝트 루트를 먼저 결정한다:
+
+1. **현재 작업 디렉토리(CWD)부터 상위로 올라가며** `.cwm/.initialized` 파일을 찾는다
+2. `.cwm/.initialized`가 존재하는 디렉토리가 프로젝트 루트이다
+3. 모든 플랜 경로는 **이 프로젝트 루트의 절대 경로** 기준으로 생성한다
+
+```bash
+# 프로젝트 루트 찾기 예시
+PROJECT_ROOT=$(pwd)
+while [ "$PROJECT_ROOT" != "/" ]; do
+  [ -f "$PROJECT_ROOT/.cwm/.initialized" ] && break
+  PROJECT_ROOT=$(dirname "$PROJECT_ROOT")
+done
+# 못 찾으면 setupwithme 필요
+[ -f "$PROJECT_ROOT/.cwm/.initialized" ] || echo "ERROR: .cwm not initialized"
+```
+
+**⛔ 절대 금지:**
+- 상대 경로(`.cwm/docs/plans/...`)만으로 파일을 생성하지 않는다
+- CWM 플러그인 소스 디렉토리 안에 플랜을 생성하지 않는다
+- `.cwm/.initialized`를 찾지 못하면 사용자에게 `/cwm:setupwithme` 실행을 안내한다
+
+**⚠️ `cd` 주의:**
+- git push 등 Bash 작업 중 `cd`로 하위 디렉토리에 진입한 경우, 플랜 파일 조작 전에 반드시 프로젝트 루트로 돌아오거나, 절대 경로를 사용한다
+- CWD가 프로젝트 루트가 아닐 수 있으므로, 항상 `.cwm/.initialized` 기준으로 루트를 재확인한다
+
 ## 실행 흐름
 
 ```
@@ -119,21 +147,23 @@ user-invocable: true
 - `complete` — 작업 완료
 
 ```bash
-echo "pending" > .cwm/docs/plans/{작업명}/.status
+echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
 ```
 
 ## 문서 저장 위치
 
 ```
-{프로젝트 루트}/.cwm/docs/plans/{작업명}/
+{프로젝트 루트의 절대 경로}/.cwm/docs/plans/{작업명}/
 ├── PLAN.md
 ├── CONTEXT.md
 ├── CHECKLIST.md
 └── .status
 ```
 
+- **프로젝트 루트** = `.cwm/.initialized`가 존재하는 디렉토리 (위의 "프로젝트 루트 결정" 참조)
 - 작업명은 kebab-case (예: `user-auth`, `api-refactor`)
 - 한 작업 = 한 폴더, 4파일이 항상 세트
+- **파일 생성 시 반드시 절대 경로 사용** (예: `/Users/me/my-project/.cwm/docs/plans/user-auth/PLAN.md`)
 
 ## 승인 대기
 
@@ -167,7 +197,7 @@ echo "pending" > .cwm/docs/plans/{작업명}/.status
 
 ### Step 1: 상태 변경
 ```bash
-echo "active" > .cwm/docs/plans/{작업명}/.status
+echo "active" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
 ```
 
 CHECKLIST.md의 "사용자 승인 완료" 체크:
@@ -198,19 +228,21 @@ CHECKLIST.md 체크:
 
 **⛔ 이 메시지 출력 후 이 턴에서 어떤 도구도 호출하지 않는다.**
 
-### Step 3: 구현 시작 (다음 턴)
+### Step 3: 구현 시작 (다음 턴 또는 /clear 후)
 
-사용자가 돌아오면:
-1. PLAN.md와 CHECKLIST.md를 **파일에서 다시 읽는다** (대화 히스토리 의존 X)
-2. `/cwm:dev-manual`로 관련 챕터 참조
-3. Phase 1부터 순서대로 구현
-4. 각 세부 작업 완료 시 CHECKLIST.md 업데이트
+사용자가 돌아오면 (**반드시 이 순서를 따른다**):
+1. **프로젝트 루트를 다시 결정한다** — `.cwm/.initialized` 파일을 찾아 절대 경로 확인
+2. `{프로젝트 루트}/.cwm/docs/plans/` 아래에서 `.status`가 `active`인 플랜 폴더를 찾는다
+3. 해당 폴더의 PLAN.md와 CHECKLIST.md를 **파일에서 다시 읽는다** (대화 히스토리 의존 X)
+4. `/cwm:dev-manual`로 관련 챕터 참조
+5. Phase 1부터 순서대로 구현 (이미 체크된 항목은 건너뜀)
+6. 각 세부 작업 완료 시 CHECKLIST.md 업데이트
 
 ## 작업 완료
 
 모든 Phase 완료 시:
 ```bash
-echo "complete" > .cwm/docs/plans/{작업명}/.status
+echo "complete" > {프로젝트 루트}/.cwm/docs/plans/{작업명}/.status
 ```
 
 ```

@@ -12,13 +12,19 @@ command -v jq &>/dev/null || exit 0
 
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
+CWD=$(cd "$CWD" 2>/dev/null && pwd) || exit 0
 
-# CWM 초기화된 프로젝트가 아니면 스킵
-[ -f "$CWD/.cwm/.initialized" ] || exit 0
+# ── 프로젝트 루트 찾기 (CWD에서 상위로 .cwm/.initialized 탐색) ──
+PROJECT_ROOT="$CWD"
+while [ "$PROJECT_ROOT" != "/" ]; do
+  [ -f "$PROJECT_ROOT/.cwm/.initialized" ] && break
+  PROJECT_ROOT=$(dirname "$PROJECT_ROOT")
+done
+[ -f "$PROJECT_ROOT/.cwm/.initialized" ] || exit 0
 
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
-LOG_DIR="$CWD/.cwm/docs/logs"
+LOG_DIR="$PROJECT_ROOT/.cwm/docs/logs"
 LOG_FILE="$LOG_DIR/change-log.md"
 
 mkdir -p "$LOG_DIR"

@@ -18,22 +18,28 @@ command -v jq &>/dev/null || exit 0
 
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 CWD=$(echo "$INPUT" | jq -r '.cwd // "."')
+CWD=$(cd "$CWD" 2>/dev/null && pwd) || exit 0
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
-
-# CWM 초기화된 프로젝트가 아니면 스킵
-[ -f "$CWD/.cwm/.initialized" ] || exit 0
 
 # Edit/Write 외 도구는 통과
 [[ "$TOOL_NAME" != "Edit" && "$TOOL_NAME" != "Write" ]] && exit 0
 
+# ── 프로젝트 루트 찾기 (CWD에서 상위로 .cwm/.initialized 탐색) ──
+PROJECT_ROOT="$CWD"
+while [ "$PROJECT_ROOT" != "/" ]; do
+  [ -f "$PROJECT_ROOT/.cwm/.initialized" ] && break
+  PROJECT_ROOT=$(dirname "$PROJECT_ROOT")
+done
+[ -f "$PROJECT_ROOT/.cwm/.initialized" ] || exit 0
+
 # ── 설정 ──
-PLANS_DIR="$CWD/.cwm/docs/plans"
-STATE_DIR="$CWD/.cwm/state"
+PLANS_DIR="$PROJECT_ROOT/.cwm/docs/plans"
+STATE_DIR="$PROJECT_ROOT/.cwm/state"
 TRACKER_FILE="$STATE_DIR/edit-tracker"
 THRESHOLD=3  # config.yml에서 읽기 가능하도록 확장 예정
 
 # config.yml에서 threshold 읽기 시도
-CONFIG_FILE="$CWD/.cwm/config.yml"
+CONFIG_FILE="$PROJECT_ROOT/.cwm/config.yml"
 if [ -f "$CONFIG_FILE" ]; then
   _T=$(grep -A1 'plan_enforcer:' "$CONFIG_FILE" 2>/dev/null | grep 'threshold:' | grep -oE '[0-9]+' | head -1)
   [ -n "$_T" ] && THRESHOLD="$_T"

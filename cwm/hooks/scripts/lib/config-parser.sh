@@ -6,7 +6,7 @@
 # ============================================================
 
 _find_config() {
-  local SEARCH_DIR="${CWD:-.}"
+  local SEARCH_DIR="${PROJECT_ROOT:-${CWD:-.}}"
 
   # Project-level config
   local CONFIG_PATH="$SEARCH_DIR/.cwm/config.yml"

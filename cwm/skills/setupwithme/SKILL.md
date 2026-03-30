@@ -184,10 +184,16 @@ Phase 1의 "첫 번째 기능"으로 3문서 생성:
 3. **활성 플랜이 있으면 → PLAN.md/CHECKLIST.md 따라 진행**
 4. **한 턴에 계획과 구현을 동시에 하지 않는다**
 
+## 디렉토리 규칙
+
+- **프로젝트 루트**: `.cwm/.initialized` 파일이 존재하는 디렉토리. 모든 CWM 파일 경로는 이 위치 기준의 절대 경로를 사용한다.
+- **`cd` 금지**: Bash로 `cd`를 사용한 경우(git 작업 등) 반드시 프로젝트 루트로 돌아온다. 또는 절대 경로만 사용하여 CWD 변경 없이 작업한다.
+- **파일 생성 시 절대 경로 필수**: `.cwm/docs/plans/...` 같은 상대 경로 대신 `/full/path/to/project/.cwm/docs/plans/...` 형태로 사용한다.
+
 ## 컨텍스트 관리
 
-- **계획 → 구현 전환 시**: .cwm/docs/plans/{작업명}/의 PLAN.md, CHECKLIST.md를 파일에서 다시 읽고 시작
-- **새 세션에서 이어서**: .status가 "active"인 플랜을 찾아 CHECKLIST.md의 미체크 항목부터 이어서 진행
+- **계획 → 구현 전환 시**: `{프로젝트 루트}/.cwm/docs/plans/{작업명}/`의 PLAN.md, CHECKLIST.md를 파일에서 다시 읽고 시작
+- **새 세션 또는 /clear 후 이어서**: 먼저 `.cwm/.initialized`로 프로젝트 루트를 찾고, `.cwm/docs/plans/` 아래에서 .status가 "active"인 플랜을 찾아 CHECKLIST.md의 미체크 항목부터 이어서 진행
 
 ## 필수 워크플로우
 
@@ -207,13 +213,13 @@ Phase 1의 "첫 번째 기능"으로 3문서 생성:
 ### 5-D: docs/ 디렉토리 구조
 
 ```bash
-mkdir -p .cwm/docs/plans .cwm/docs/logs .cwm/docs/reports
+mkdir -p {프로젝트 루트}/.cwm/docs/plans {프로젝트 루트}/.cwm/docs/logs {프로젝트 루트}/.cwm/docs/reports
 ```
 
 ### 5-E: 완료 마커
 
 ```bash
-touch .cwm/.initialized
+touch {프로젝트 루트}/.cwm/.initialized
 ```
 
 ### 완료 메시지
