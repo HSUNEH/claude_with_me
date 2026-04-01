@@ -193,7 +193,7 @@ Phase 1의 "첫 번째 기능"으로 3문서 생성:
 ## 컨텍스트 관리
 
 - **계획 → 구현 전환 시**: `{프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/`의 PLAN.md, CHECKLIST.md를 파일에서 다시 읽고 시작
-- **새 세션 또는 /clear 후 이어서**: 먼저 `.cwm/.initialized`로 프로젝트 루트를 찾고, `.cwm/docs/plans/` 아래에서 .status가 "active"인 플랜을 찾아 CHECKLIST.md의 미체크 항목부터 이어서 진행
+- **새 세션 또는 /compact 후 이어서**: 먼저 `.cwm/.initialized`로 프로젝트 루트를 찾고, `.cwm/docs/plans/` 아래에서 .status가 "active"인 플랜을 찾아 CHECKLIST.md의 미체크 항목부터 이어서 진행
 
 ## 필수 워크플로우
 
