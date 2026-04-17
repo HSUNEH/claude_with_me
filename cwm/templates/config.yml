@@ -95,17 +95,13 @@ plan_enforcer:
 # ─── 6. 완료 검사 ───────────────────────────────────────────
 completion_check:
   threshold_immediate_fix: 3
-  threshold_agent_recommend: 4
+  threshold_review_recommend: 4
 
 
 # ─── 7. 에이전트 ────────────────────────────────────────────
 agents:
-  qa-agent:
-    description: "코드 검토, 오류 수정, 구조 개선"
-  test-agent:
-    description: "기능 테스트, 오류 진단, 테스트 작성"
-  planning-agent:
-    description: "계획 수립, 계획 검토, 문서 작성"
+  websearchwithme:
+    description: "웹 리서치 (facet 분해 + 다중 쿼리 + 병렬 검색 + 구조화 리포트)"
 
 
 # ─── 8. 일반 설정 ───────────────────────────────────────────

@@ -3,7 +3,7 @@
 # [Stop Hook] CWM Completion Checker
 # ============================================================
 # 작업 완료 시 린트/타입 검사 수행.
-# 에러 0건=통과, 1-3건=즉시수정, 4건+=qa-agent 위임 권장.
+# 에러 0건=통과, 1-3건=즉시수정, 4건+=집중 검토 권장.
 # ============================================================
 
 INPUT=$(cat)
@@ -137,14 +137,14 @@ MSG
 else
   cat <<MSG
 ───────────────────────────────────────────
-🚨 [CWM] ${TOTAL_ISSUES} issues found — consider qa-agent
+🚨 [CWM] ${TOTAL_ISSUES} issues found — focused review recommended
 ───────────────────────────────────────────
 MSG
   [ $ERROR_COUNT -gt 0 ] && echo -e "\nLint/Type errors (${ERROR_COUNT}):${ERRORS}"
   [ $PATTERN_COUNT -gt 0 ] && echo -e "\nCode pattern warnings (${PATTERN_COUNT}):${PATTERN_WARNINGS}"
   cat <<'MSG'
 
-Recommended: delegate to qa-agent for review & auto-fix.
+Recommended: fix incrementally or delegate to websearchwithme for unknown errors.
 ───────────────────────────────────────────
 MSG
 fi

@@ -173,9 +173,7 @@ CWM 훅이 동작하면 상태줄에 표시됩니다:
 
 | 에이전트 | 역할 | 트리거 |
 |----------|------|--------|
-| **qa-agent** | 코드 검토, 오류 수정, 보고서 작성 | 린트 에러 4건+ |
-| **test-agent** | 테스트 작성/실행, 오류 진단 | 테스트 필요 시 |
-| **planning-agent** | 계획 수립/검토, 문서 작성 | 기획 필요 시 |
+| **websearchwithme** | 웹 리서치 (facet 분해 + 다중 쿼리 + 병렬 검색 + 구조화 리포트) | 외부 정보·디버깅·기술비교 필요 시 |
 
 ---
 
@@ -189,7 +187,7 @@ your-project/
 │   ├── docs/
 │   │   ├── plans/{작업명}/         계획 문서 (PLAN, CONTEXT, CHECKLIST, .status)
 │   │   ├── logs/change-log.md     변경 이력
-│   │   └── reports/               에이전트 보고서
+│   │   └── research/              웹 리서치 리포트
 │   ├── state/                     훅 내부 상태
 │   └── .initialized               초기화 완료 마커
 └── CLAUDE.md                       CWM 워크플로우 규칙
@@ -207,7 +205,7 @@ plan_enforcer:
 
 completion_check:
   threshold_immediate_fix: 3 # 즉시 수정 권장 이슈 수
-  threshold_agent_recommend: 4 # qa-agent 위임 권장 이슈 수
+  threshold_review_recommend: 4 # 별도 검토 권장 이슈 수
 
 general:
   require_plan: true         # 플랜 강제 글로벌 토글

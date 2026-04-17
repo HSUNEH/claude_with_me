@@ -205,9 +205,7 @@ Phase 1의 "첫 번째 기능"으로 3문서 생성:
 
 ## 서브에이전트
 
-- **qa-agent**: 코드 검토, 오류 수정, 구조 개선
-- **test-agent**: 기능 테스트, 오류 진단, 테스트 작성
-- **planning-agent**: 계획 수립/검토, 문서 작성
+- **websearchwithme**: 웹 리서치 전문 (facet 분해 + 다중 쿼리 변형으로 GitHub/SO/Reddit/HN/공식 문서 조사). 디버깅·기술비교·베스트프랙티스 조사 시 Task로 위임
 ````
 
 ### 5-D: docs/ 디렉토리 구조
