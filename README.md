@@ -171,9 +171,29 @@ CWM 훅이 동작하면 상태줄에 표시됩니다:
 
 ### Agents
 
-| 에이전트 | 역할 | 트리거 |
-|----------|------|--------|
-| **websearchwithme** | 웹 리서치 (facet 분해 + 다중 쿼리 + 병렬 검색 + 구조화 리포트) | 외부 정보·디버깅·기술비교 필요 시 |
+| 에이전트 | 역할 | 언제 쓰이는가 |
+|----------|------|--------------|
+| **websearchwithme** | 웹 리서치 전문 (facet 분해 + 다중 쿼리 변형 + 병렬 검색 + 구조화 리포트) | 디버깅·기술비교·베스트프랙티스 조사 |
+
+#### websearchwithme 동작
+
+```
+질의 → Facet 분해 (2-5개) → 쿼리 변형 (각 3-5개) → 병렬 WebSearch/WebFetch
+     → 신뢰도 계층 분류 (공식 > GitHub > SO/HN > 블로그)
+     → Executive Summary / Findings / Sources / Recommendations 리포트
+     → .cwm/docs/research/{YYMMDD}-{주제}.md 저장
+     → active 플랜 있으면 CONTEXT.md에 링크 추가
+```
+
+**트리거 예시:**
+- 에러 디버깅: `"Next.js 14 streaming SSR 끊김 원인 찾아줘"`
+- 기술 비교: `"Prisma vs Drizzle, PostgreSQL 기준으로 비교"`
+- 베스트 프랙티스: `"JWT refresh token rotation 패턴 조사"`
+
+**출력 규칙:**
+- 모든 주장에 URL 인용 + 날짜 스탬프
+- 상충 정보 숨기지 않음
+- 공식 문서 우선, 검증 불가 항목은 "확인 필요" 태그
 
 ---
 
