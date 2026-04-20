@@ -159,6 +159,7 @@ CWM 훅이 동작하면 상태줄에 표시됩니다:
 | `/cwm:setupwithme` | 프로젝트 초기화 5단계 위저드 |
 | `/cwm:planwithme` | 3문서 + .status 생성, 승인 워크플로우 (모호한 요청은 interviewwithme로 자동 위임) |
 | `/cwm:interviewwithme` | 요구사항 명확화 Socratic Q&A (3차원 채점 + 브리프 생성, 단독·위임 호환) |
+| `/cwm:buildwithme` | 활성 플랜을 Phase 단위로 build-runner 에이전트에 위임, 구현+테스트 일괄 수행 |
 | `/cwm:dev-manual` | 작업 유형별 개발 매뉴얼 챕터 참조 |
 | `/cwm:custom_command` | CWM HUD 설치 (상태줄에 플랜 상태 표시) |
 
@@ -175,6 +176,7 @@ CWM 훅이 동작하면 상태줄에 표시됩니다:
 | 에이전트 | 역할 | 언제 쓰이는가 |
 |----------|------|--------------|
 | **websearchwithme** | 웹 리서치 전문 (facet 분해 + 다중 쿼리 변형 + 병렬 검색 + 구조화 리포트) | 디버깅·기술비교·베스트프랙티스 조사 |
+| **build-runner** | Phase 단위 구현+테스트+재시도 전문 | buildwithme가 Phase마다 자동 위임 |
 
 #### websearchwithme 동작
 

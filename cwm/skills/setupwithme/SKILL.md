@@ -206,6 +206,7 @@ Phase 1의 "첫 번째 기능"으로 3문서 생성:
 ## 서브에이전트
 
 - **websearchwithme**: 웹 리서치 전문 (facet 분해 + 다중 쿼리 변형으로 GitHub/SO/Reddit/HN/공식 문서 조사). 디버깅·기술비교·베스트프랙티스 조사 시 Task로 위임
+- **build-runner**: Phase 단위 구현+테스트+재시도 전문. buildwithme가 Phase마다 자동 위임해 메인 컨텍스트 오염 없이 실행
 ````
 
 ### 5-D: docs/ 디렉토리 구조

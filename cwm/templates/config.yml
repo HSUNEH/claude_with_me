@@ -102,6 +102,16 @@ completion_check:
 agents:
   websearchwithme:
     description: "웹 리서치 (facet 분해 + 다중 쿼리 + 병렬 검색 + 구조화 리포트)"
+  build-runner:
+    description: "Phase 단위 구현+테스트+재시도 (buildwithme가 위임)"
+
+
+# ─── 7-B. 빌드 (buildwithme) ────────────────────────────────
+build:
+  test_cmd: ""                # 빈값이면 프로젝트 매니페스트로 추론
+  lint_cmd: ""                # 빈값이면 프로젝트 매니페스트로 추론
+  max_retries: 3              # Phase당 테스트 재시도 횟수
+  run_on_phase_complete: true # Phase 완료 시점에 린트/테스트 실행
 
 
 # ─── 8. 일반 설정 ───────────────────────────────────────────
