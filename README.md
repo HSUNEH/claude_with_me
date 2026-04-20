@@ -157,7 +157,8 @@ CWM 훅이 동작하면 상태줄에 표시됩니다:
 | 명령어 | 설명 |
 |--------|------|
 | `/cwm:setupwithme` | 프로젝트 초기화 5단계 위저드 |
-| `/cwm:planwithme` | 3문서 + .status 생성, 승인 워크플로우 |
+| `/cwm:planwithme` | 3문서 + .status 생성, 승인 워크플로우 (모호한 요청은 interviewwithme로 자동 위임) |
+| `/cwm:interviewwithme` | 요구사항 명확화 Socratic Q&A (3차원 채점 + 브리프 생성, 단독·위임 호환) |
 | `/cwm:dev-manual` | 작업 유형별 개발 매뉴얼 챕터 참조 |
 | `/cwm:custom_command` | CWM HUD 설치 (상태줄에 플랜 상태 표시) |
 

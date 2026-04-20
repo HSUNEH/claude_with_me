@@ -42,28 +42,98 @@ done
 1. 사용자 작업 지시
        │
        ▼
-2. 계획 수립 (이 스킬)
+2. 초기 모호도 채점 (Goal / Scope / Acceptance)
+   임계값: ambiguity ≤ 20%
+       │
+    ┌──┴──┐
+    ▼     ▼
+> 20%   ≤ 20%
+    │     │
+    ▼     │
+[interviewwithme 위임]
+  Skill("cwm:interviewwithme", args=<원 요청>)
+  → Socratic Q&A 루프
+  → .cwm/docs/briefs/{YYMMDD}-{주제}.md 생성
+  → 명확화된 Goal/Scope/Acceptance 인계
+    │     │
+    └──┬──┘
+       ▼
+3. 계획 수립 (interview 결과 있으면 그것을 기반으로)
    ├── 요구사항 분석
    ├── 기존 코드 조사
    └── 구현 전략 설계
        │
        ▼
-3. 4파일 생성 → .cwm/docs/plans/{YYMMDD}-{작업명}/
+4. 4파일 생성 → .cwm/docs/plans/{YYMMDD}-{작업명}/
    ├── PLAN.md         계획서
-   ├── CONTEXT.md      맥락 노트
+   ├── CONTEXT.md      맥락 노트 (interview 결과 통합)
    ├── CHECKLIST.md    체크리스트
    └── .status         "pending"
        │
        ▼
-4. ⛔ 반드시 멈춤
+5. ⛔ 반드시 멈춤
    ├── 계획 요약 표시
    └── 사용자 승인 대기
        │
        ▼
-5. 승인 시:
+6. 승인 시:
    ├── .status → "active"
    ├── CHECKLIST 승인 체크
    └── /compact 안내 → 구현 시작
+```
+
+## 초기 모호도 채점
+
+요청을 받으면 **내부에서만** 3차원(Goal/Scope/Acceptance) 채점을 수행한다. 사용자에게 숫자는 노출하지 않는다.
+
+| 차원 | 가중치 | 판단 기준 |
+|------|-------|----------|
+| **Goal** | 0.40 | 목적이 한 문장으로 정의되는가, 결과물이 명확한가 |
+| **Scope** | 0.30 | 영향 파일·모듈·외부 의존·비범위가 정의됐는가 |
+| **Acceptance** | 0.30 | 완료 기준이 테스트/확인 가능한가 |
+
+**모호도**: `ambiguity = 1 - (goal × 0.40 + scope × 0.30 + acceptance × 0.30)`
+**임계값**: `ambiguity > 0.20` → 인터뷰 위임
+
+**예시:**
+```
+"로그인 기능 만들어줘" → Goal 0.6 / Scope 0.2 / Acceptance 0.1 → 67% → 위임
+"src/auth/login.ts의 bcrypt 10→12" → 전부 0.9+ → 3% → 바로 계획 수립
+```
+
+## interviewwithme 위임
+
+모호도 > 20%인 경우, 직접 질문하지 말고 **반드시 interviewwithme 스킬에 위임**한다:
+
+```
+Skill("cwm:interviewwithme", args="<원 요청 그대로>")
+```
+
+interviewwithme가 Socratic Q&A 루프(최대 5라운드)를 수행하고 브리프를 `.cwm/docs/briefs/{YYMMDD}-{주제}.md`로 저장한 뒤, 다음 구조화 데이터를 인계한다:
+
+- Goal 한 문장
+- Scope (포함/제외/제약)
+- Acceptance 체크 목록
+- 결정 사항 표
+- 인터뷰 기록 (Q&A)
+- 브리프 파일 경로
+
+### 인계 데이터 → 3문서 매핑
+
+| interviewwithme 산출 | → | planwithme 반영 위치 |
+|---------------------|---|---------------------|
+| Goal 한 문장 | → | PLAN.md 개요 (목적) |
+| Scope (포함/제외/제약) | → | PLAN.md 범위 + CONTEXT.md 제약 |
+| Acceptance 체크 목록 | → | CHECKLIST.md 품질 체크 |
+| 결정 사항 표 | → | CONTEXT.md 결정 기록 |
+| 인터뷰 기록 (Q&A) | → | CONTEXT.md "인터뷰 기록" 섹션 |
+| 브리프 파일 경로 | → | CONTEXT.md 참조 자료 링크 |
+
+### 인터뷰 취소 시
+
+사용자가 인터뷰 중 취소하면 interviewwithme가 "cancelled"를 반환한다. 이 경우 3문서 생성을 중단하고 사용자에게:
+```
+📋 인터뷰가 취소되었습니다. 요청을 다시 명확히 해서 알려주시면 계획을 세우겠습니다.
 ```
 
 ## 3문서 + .status 작성 규칙
