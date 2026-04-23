@@ -60,7 +60,9 @@
     ┌─────────────────────────────────┐
     │  /cwm:planwithme {작업명}         │  ← 플랜 세우기
     │      ↓                          │
-    │  승인 → /compact → 구현            │  ← 작업 진행
+    │  승인 → /compact                 │  ← 계획 확정
+    │      ↓                          │
+    │  /cwm:buildwithme               │  ← Phase 단위 자동 구현
     │      ↓                          │
     │  완료 → 다음 작업                  │  ← 반복
     └─────────────────────────────────┘
@@ -74,14 +76,20 @@
 
 5단계 위저드로 `.cwm/config.yml`, 개발 매뉴얼, `CLAUDE.md`를 생성합니다.
 
-### 2. planwithme → 구현 반복
+### 2. planwithme → buildwithme 반복
 
 ```
 > /cwm:planwithme 로그인-기능
 → PLAN.md, CONTEXT.md, CHECKLIST.md 생성
-→ 승인 → /compact → 구현 시작
+→ 승인 → /compact
+
+> /cwm:buildwithme
+→ 활성 플랜의 Phase 단위로 build-runner 에이전트에 위임
+→ 구현 + 테스트 일괄 수행, CHECKLIST 자동 갱신
 → 완료 → /cwm:planwithme 다음-작업
 ```
+
+> 💡 계획 확정 후에는 직접 구현하지 말고 `/cwm:buildwithme`로 위임하세요. build-runner가 Phase 단위로 나눠 구현·테스트·재시도까지 자동 처리합니다.
 
 간단한 수정은 플랜 없이 바로 진행됩니다:
 
