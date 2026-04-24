@@ -170,6 +170,7 @@ CWM 훅이 동작하면 상태줄에 표시됩니다:
 | `/cwm:buildwithme` | 활성 플랜을 Phase 단위로 build-runner 에이전트에 위임, 구현+테스트 일괄 수행 |
 | `/cwm:dev-manual` | 작업 유형별 개발 매뉴얼 챕터 참조 |
 | `/cwm:custom_command` | CWM HUD 설치 (상태줄에 플랜 상태 표시) |
+| `/cwm:patch-ralph-loop` | `ralph-loop` stop-hook 세션 격리 버그 로컬 패치 (업스트림 수정 전까지) |
 
 ### Hooks
 

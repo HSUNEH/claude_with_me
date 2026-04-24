@@ -1,6 +1,6 @@
 {
   "name": "cwm",
-  "version": "2.0.0",
+  "version": "2.4.2",
   "description": "CWM (Claude With Me) - Plan-first development workflow",
   "author": "HSUNEH",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "agents/",
     "templates/",
     "hud/",
-    "scripts/"
+    "scripts/",
+    "patches/"
   ]
 }
