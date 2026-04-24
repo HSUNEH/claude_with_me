@@ -53,7 +53,7 @@ done
 [interviewwithme 위임]
   Skill("cwm:interviewwithme", args=<원 요청>)
   → Socratic Q&A 루프
-  → .cwm/docs/briefs/{YYMMDD}-{주제}.md 생성
+  → .cwm/docs/briefs/{YYMMDD}{NN}-{주제}.md 생성
   → 명확화된 Goal/Scope/Acceptance 인계
     │     │
     └──┬──┘
@@ -64,7 +64,7 @@ done
    └── 구현 전략 설계
        │
        ▼
-4. 4파일 생성 → .cwm/docs/plans/{YYMMDD}-{작업명}/
+4. 4파일 생성 → .cwm/docs/plans/{YYMMDD}{NN}-{작업명}/
    ├── PLAN.md         계획서
    ├── CONTEXT.md      맥락 노트 (interview 결과 통합)
    ├── CHECKLIST.md    체크리스트
@@ -109,7 +109,7 @@ done
 Skill("cwm:interviewwithme", args="<원 요청 그대로>")
 ```
 
-interviewwithme가 Socratic Q&A 루프(최대 5라운드)를 수행하고 브리프를 `.cwm/docs/briefs/{YYMMDD}-{주제}.md`로 저장한 뒤, 다음 구조화 데이터를 인계한다:
+interviewwithme가 Socratic Q&A 루프(최대 5라운드)를 수행하고 브리프를 `.cwm/docs/briefs/{YYMMDD}{NN}-{주제}.md`로 저장한 뒤, 다음 구조화 데이터를 인계한다:
 
 - Goal 한 문장
 - Scope (포함/제외/제약)
@@ -217,13 +217,13 @@ interviewwithme가 Socratic Q&A 루프(최대 5라운드)를 수행하고 브리
 - `complete` — 작업 완료
 
 ```bash
-echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.status
+echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}{NN}-{작업명}/.status
 ```
 
 ## 문서 저장 위치
 
 ```
-{프로젝트 루트의 절대 경로}/.cwm/docs/plans/{YYMMDD}-{작업명}/
+{프로젝트 루트의 절대 경로}/.cwm/docs/plans/{YYMMDD}{NN}-{작업명}/
 ├── PLAN.md
 ├── CONTEXT.md
 ├── CHECKLIST.md
@@ -231,10 +231,31 @@ echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.sta
 ```
 
 - **프로젝트 루트** = `.cwm/.initialized`가 존재하는 디렉토리 (위의 "프로젝트 루트 결정" 참조)
-- **폴더명 = `YYYYMMDD-작업명`** (예: `260330-user-auth`, `260330-api-refactor`)
+- **폴더명 = `YYMMDD{NN}-작업명`** (예: `26033001-user-auth`, `26033002-api-refactor`)
+  - `YYMMDD`: 6자리 날짜 (`date +%y%m%d`)
+  - `NN`: 같은 날짜의 생성 순번, 2자리 zero-pad (01, 02, …) — 계산 규칙은 아래 참고
 - 작업명은 kebab-case
 - 한 작업 = 한 폴더, 4파일이 항상 세트
-- **파일 생성 시 반드시 절대 경로 사용** (예: `/Users/me/my-project/.cwm/docs/plans/260330-user-auth/PLAN.md`)
+- **파일 생성 시 반드시 절대 경로 사용** (예: `/Users/me/my-project/.cwm/docs/plans/26033001-user-auth/PLAN.md`)
+
+### 순번 `NN` 계산
+
+폴더 생성 직전에 대상 디렉토리를 스캔해 오늘 날짜의 최대 NN + 1 을 사용한다:
+
+```bash
+DATE=$(date +%y%m%d)                    # 예: 260424
+TARGET_DIR="$PROJECT_ROOT/.cwm/docs/plans"
+LAST=$(ls "$TARGET_DIR" 2>/dev/null \
+  | grep -E "^${DATE}[0-9]{2}-" \
+  | sed -E "s/^${DATE}([0-9]{2})-.*/\1/" \
+  | sort -n | tail -1)
+NN=$(printf "%02d" $((10#${LAST:-0} + 1)))
+FOLDER="${DATE}${NN}-${KEBAB_NAME}"     # 예: 26042401-user-auth
+```
+
+- 오늘 항목이 없으면 `NN=01`
+- `10#${LAST:-0}` — `08`, `09` 값이 8진수로 해석되는 것을 방지
+- 기존 `YYMMDD-{이름}` (순번 없음) 폴더는 정규식 불일치로 스캔에서 제외 → 공존 가능
 
 ## 승인 대기
 
@@ -243,7 +264,7 @@ echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.sta
 ```
 📋 계획 수립 완료 — 검토 요청
 
-📂 .cwm/docs/plans/{YYMMDD}-{작업명}/
+📂 .cwm/docs/plans/{YYMMDD}{NN}-{작업명}/
   ├── PLAN.md       ← 전체 구현 계획
   ├── CONTEXT.md    ← 결정 근거
   ├── CHECKLIST.md  ← 작업 체크리스트
@@ -268,7 +289,7 @@ echo "pending" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.sta
 
 ### Step 1: 상태 변경
 ```bash
-echo "active" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.status
+echo "active" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}{NN}-{작업명}/.status
 ```
 
 CHECKLIST.md의 "사용자 승인 완료" 체크:
@@ -283,7 +304,7 @@ CHECKLIST.md의 "사용자 승인 완료" 체크:
 ✅ 계획이 승인되었습니다
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📂 .cwm/docs/plans/{YYMMDD}-{작업명}/.status → active
+📂 .cwm/docs/plans/{YYMMDD}{NN}-{작업명}/.status → active
 
 
 컨텍스트를 정리하면 더 원활합니다.
@@ -314,7 +335,7 @@ CHECKLIST.md 체크:
 
 모든 Phase 완료 시:
 ```bash
-echo "complete" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.status
+echo "complete" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}{NN}-{작업명}/.status
 ```
 
 ```
@@ -322,7 +343,7 @@ echo "complete" > {프로젝트 루트}/.cwm/docs/plans/{YYMMDD}-{작업명}/.st
 ✅ {작업명} 완료
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-.cwm/docs/plans/{YYMMDD}-{작업명}/.status → complete
+.cwm/docs/plans/{YYMMDD}{NN}-{작업명}/.status → complete
 ```
 
 ## 중요 규칙

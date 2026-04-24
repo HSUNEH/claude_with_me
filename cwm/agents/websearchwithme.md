@@ -175,12 +175,20 @@ done
 DATE=$(date +%y%m%d)
 # 주제는 kebab-case, 예: 260417-nextjs-streaming-ssr
 mkdir -p "$PROJECT_ROOT/.cwm/docs/research"
-# 리포트를 "$PROJECT_ROOT/.cwm/docs/research/${DATE}-${TOPIC}.md" 로 Write
+# 순번 NN 계산 (같은 날짜의 기존 리서치 최댓값 + 1, 없으면 01)
+RESEARCH_DIR="$PROJECT_ROOT/.cwm/docs/research"
+mkdir -p "$RESEARCH_DIR"
+LAST=$(ls "$RESEARCH_DIR" 2>/dev/null \
+  | grep -E "^${DATE}[0-9]{2}-" \
+  | sed -E "s/^${DATE}([0-9]{2})-.*/\1/" \
+  | sort -n | tail -1)
+NN=$(printf "%02d" $((10#${LAST:-0} + 1)))
+# 리포트를 "$RESEARCH_DIR/${DATE}${NN}-${TOPIC}.md" 로 Write
 ```
 
 저장 후 경로를 출력한다:
 ```
-📄 리포트 저장: .cwm/docs/research/{YYMMDD}-{주제}.md
+📄 리포트 저장: .cwm/docs/research/{YYMMDD}{NN}-{주제}.md
 ```
 
 ## 플랜 연계

@@ -11,7 +11,7 @@ color: green
 ## 입력 프로토콜
 
 buildwithme가 보내는 입력은 반드시 다음 필드를 포함합니다:
-- **활성 플랜 경로** (`.cwm/docs/plans/{YYMMDD}-{작업명}/`)
+- **활성 플랜 경로** (`.cwm/docs/plans/{YYMMDD}{NN}-{작업명}/`)
 - **Phase 번호 및 이름**
 - **lint_cmd** (있을 때만)
 - **test_cmd** (있을 때만)
